@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>AuraFlow - My Tasks</title>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">AuraFlow</div>
+        <div style="font-size: 14px; color: #64748b; margin-bottom: 20px;">🎓 Student<br><b>Subhan</b></div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="tasks.html" class="active">Tasks</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="settings.html">Settings</a></li>
+        </ul>
+        <a href="index.html" class="logout" style="color: #ef4444; text-decoration: none; margin-top: auto;">Logout</a>
+    </div>
+
+    <main class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>My Tasks</h1>
+                <p style="color: #64748b;">Saturday, December 20, 2025</p>
+            </div>
+            <button class="btn-primary" style="width: auto; padding: 10px 20px;" onclick="toggleModal(true)">+ New Task</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+            <input type="text" placeholder="Search tasks..." style="flex-grow: 1; margin: 0;">
+            <select style="width: 200px; margin: 0;">
+                <option>All Categories</option>
+            </select>
+        </div>
+
+        <div class="task-tabs">
+            <div class="tab active">Pending (0)</div>
+            <div class="tab">In Progress (1)</div>
+            <div class="tab">Completed (0)</div>
+        </div>
+
+        <div class="card" style="margin-top: 20px; text-align: center; padding: 60px; color: #64748b;">
+            No pending tasks
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span style="float: right; cursor: pointer; font-size: 24px;" onclick="toggleModal(false)">&times;</span>
+                <h2>Create New Task</h2>
+                <p>Add a new task to your workflow</p>
+            </div>
+
+            <form>
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label>Task Name *</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="full-width">
+                        <label>Description</label>
+                        <textarea style="width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label>Category *</label>
+                        <select><option>Other</option></select>
+                    </div>
+                    <div>
+                        <label>Priority</label>
+                        <select><option>Medium</option></select>
+                    </div>
+                    <div>
+                        <label>Estimated Duration (minutes) *</label>
+                        <input type="number" value="30">
+                    </div>
+                    <div>
+                        <label>Deadline *</label>
+                        <input type="datetime-local">
+                    </div>
+                    <div class="full-width">
+                        <label>Subject</label>
+                        <input type="text" placeholder="e.g., Math, Physics, History">
+                    </div>
+                </div>
+
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                    <span style="font-size: 14px;">Hard Deadline (Cannot be moved)</span>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" style="padding: 10px 20px; border: none; background: #f1f5f9; border-radius: 6px; cursor: pointer;" onclick="toggleModal(false)">Cancel</button>
+                    <button type="submit" class="btn-primary" style="width: auto; padding: 10px 20px;">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <script>
+        function toggleModal(show) {
+            const modal = document.getElementById('taskModal');
+            modal.style.display = show ? 'flex' : 'none';
+        }
+
+        // Close modal if user clicks outside the content box
+        window.onclick = function(event) {
+            const modal = document.getElementById('taskModal');
+            if (event.target == modal) {
+                toggleModal(false);
+            }
+        }
+    </script>
+</body>
+</html>
