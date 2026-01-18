@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - TaskFlow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="brand-area">
+                <h1 class="brand-logo">TaskFlow</h1>
+                <div class="user-info">
+                    <span class="role-line"><i class="fa-solid fa-graduation-cap"></i> Student</span>
+                    <span class="user-name">Demo User</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-grip-vertical"></i> Dashboard
+                </a>
+                <a href="tasks.html" class="nav-link">
+                    <i class="fa-solid fa-list-check"></i> Tasks
+                </a>
+                <a href="analytics.html" class="nav-link active">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-link">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="content-area">
+        
+        <header class="page-header">
+            <h2 class="page-title">Analytics</h2>
+            <p class="page-date">Sunday, January 18, 2026</p>
+        </header>
+
+        <section class="analytics-stats-row">
+            <div class="stat-box">
+                <label>Total Tasks</label>
+                <div class="stat-number">2</div>
+            </div>
+            <div class="stat-box">
+                <label>Completed</label>
+                <div class="stat-number green">1</div>
+            </div>
+            <div class="stat-box">
+                <label>In Progress</label>
+                <div class="stat-number blue">1</div>
+            </div>
+            <div class="stat-box">
+                <label>Total Time Spent</label>
+                <div class="stat-number">2h</div>
+            </div>
+        </section>
+
+        <section class="charts-grid">
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Tasks Completed This Week</h3>
+                    <p>Daily task completion overview</p>
+                </div>
+                <div class="chart-area bar-chart-placeholder">
+                    <div class="grid-line"><span>4</span></div>
+                    <div class="grid-line"><span>3</span></div>
+                    <div class="grid-line"><span>2</span></div>
+                    <div class="grid-line"><span>1</span></div>
+                    <div class="grid-line"><span>0</span></div>
+                    
+                    <div class="x-axis">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="dot purple"></span> Tasks Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Productivity vs. Time of Day</h3>
+                    <p>When you're most productive</p>
+                </div>
+                <div class="chart-area line-chart-placeholder">
+                    <div class="grid-line"><span>4</span></div>
+                    <div class="grid-line"><span>3</span></div>
+                    <div class="grid-line"><span>2</span></div>
+                    <div class="grid-line"><span>1</span></div>
+                    <div class="grid-line"><span>0</span></div>
+
+                    <div class="x-axis two-point">
+                        <span>Afternoon (12-17)</span>
+                        <span>Night (22-6)</span>
+                    </div>
+
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="dot purple-outline"></span> Tasks Completed</span>
+                        <span class="legend-item"><span class="dot green-outline"></span> Minutes Worked</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Task Distribution by Category</h3>
+                    <p>Breakdown of your tasks</p>
+                </div>
+                <div class="chart-area pie-layout">
+                    <div class="pie-chart-circle"></div>
+                    <span class="pie-label">Assignment: 100%</span>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3>Weekly Time Investment</h3>
+                    <p>Time spent each day (in minutes)</p>
+                </div>
+                <div class="chart-area bar-chart-placeholder">
+                    <div class="grid-line"><span>4</span></div>
+                    <div class="grid-line"><span>3</span></div>
+                    <div class="grid-line"><span>2</span></div>
+                    <div class="grid-line"><span>1</span></div>
+                    <div class="grid-line"><span>0</span></div>
+                    
+                    <div class="x-axis">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="dot green"></span> Minutes Worked</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

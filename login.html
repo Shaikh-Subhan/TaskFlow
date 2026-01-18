@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TaskFlow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="center-body">
+
+    <div class="login-wrapper">
+        <a href="index.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to role selection
+        </a>
+
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Welcome to <span class="brand-name">TaskFlow</span></h2>
+                <p>Enter your credentials to access your account</p>
+            </div>
+
+            <form action="dashboard.html" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="login-btn">Log In</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

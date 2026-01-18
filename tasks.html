@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks - TaskFlow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="brand-area">
+                <h1 class="brand-logo">TaskFlow</h1>
+                <div class="user-info">
+                    <span class="role-line"><i class="fa-solid fa-graduation-cap"></i> Student</span>
+                    <span class="user-name">Demo User</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fa-solid fa-grip-vertical"></i> Dashboard
+                </a>
+                <a href="tasks.html" class="nav-link active">
+                    <i class="fa-solid fa-list-check"></i> Tasks
+                </a>
+                <a href="analytics.html" class="nav-link">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear"></i> Settings
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-link">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="content-area">
+        
+        <header class="page-header flex-header">
+            <div>
+                <h2 class="page-title">My Tasks</h2>
+                <p class="page-date">Sunday, January 18, 2026</p>
+            </div>
+            <button class="new-task-btn" id="openModalBtn">
+                <i class="fa-solid fa-plus"></i> New Task
+            </button>
+        </header>
+
+        <div class="filters-bar">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search tasks..." class="search-input">
+            </div>
+            <div class="dropdowns">
+                <select class="filter-select">
+                    <option>All Categories</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Subjects</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="task-tabs">
+            <button class="tab-btn active">Pending (1)</button>
+            <button class="tab-btn">In Progress (1)</button>
+            <button class="tab-btn">Completed (1)</button>
+        </div>
+
+        <div class="tasks-list">
+            <div class="task-card cram-active">
+                <div class="task-top-row">
+                    <div class="task-title-group">
+                        <h3>Gournal Writting</h3>
+                        <span class="cram-badge"><i class="fa-solid fa-circle-exclamation"></i> CRAM MODE</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="icon-btn"><i class="fa-regular fa-circle-play"></i></button>
+                        <button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+                </div>
+
+                <div class="task-meta">
+                    <span><i class="fa-regular fa-clock"></i> 30 min</span>
+                    <span><i class="fa-regular fa-calendar"></i> Jan 19, 2026 7:21 PM</span>
+                    <span><i class="fa-solid fa-book-open"></i> SEPP</span>
+                </div>
+
+                <div class="task-tags">
+                    <span class="tag medium">medium</span>
+                    <span class="tag pending">pending</span>
+                    <span class="tag type">assignment</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Create New Task</h2>
+                    <p>Add a new task to your workflow</p>
+                </div>
+                <span class="close-modal">&times;</span>
+            </div>
+            
+            <form class="modal-form">
+                <div class="form-group">
+                    <label>Task Name <span class="required">*</span></label>
+                    <input type="text" class="modal-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="modal-input" rows="3"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Category <span class="required">*</span></label>
+                        <select class="modal-input">
+                            <option>Other</option>
+                            <option>Assignment</option>
+                            <option>Exam Prep</option>
+                        </select>
+                    </div>
+                    <div class="form-group half">
+                        <label>Priority</label>
+                        <select class="modal-input">
+                            <option>Low</option>
+                            <option selected>Medium</option>
+                            <option>High</option>
+                            <option>Urgent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimated Duration (minutes) <span class="required">*</span></label>
+                    <input type="number" class="modal-input" value="30">
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" class="modal-input" placeholder="e.g., Math, Physics, History">
+                </div>
+
+                <div class="form-group toggle-group">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">Hard Deadline (Cannot be moved)</span>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn-create">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById("taskModal");
+        const btn = document.getElementById("openModalBtn");
+        const spans = document.getElementsByClassName("close-modal");
+        const cancelBtn = document.querySelector(".close-modal-btn");
+
+        // Open Modal
+        btn.onclick = function() {
+            modal.style.display = "flex";
+        }
+
+        // Close functions
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        spans[0].onclick = closeModal;
+        cancelBtn.onclick = closeModal;
+
+        // Close if clicked outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
