@@ -5,7 +5,7 @@ def home(request):
     return render(request, 'index.html')
 
 def dashboard(request):
-    tasks = Task.objects.filter(is_completed = False)
+    tasks = Task.objects.filter(status = 'Pending')
     contex = {
         'tasks':tasks,
     }
