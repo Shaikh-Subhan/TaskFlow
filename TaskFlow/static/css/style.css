@@ -340,3 +340,11 @@ input[type="date"] {
     /* This specific filter converts the default icon to your dark #0f172a color */
     filter: invert(7%) sepia(21%) saturate(2206%) hue-rotate(185deg) brightness(96%) contrast(93%);
 }
+
+.bg-custom-tab {
+    background-color: #d1d8e7 !important;
+}
+
+.bg-custom-tab :hover:not(.active){
+    background-color: #d1d8e7 !important;
+}

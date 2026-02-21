@@ -115,94 +115,217 @@
             </div>
 
             <div
-                class="btn-group w-100 mb-4 bg-light p-1 rounded-3"
-                role="group">
+                class="nav nav-pills w-100 mb-4 bg-light p-1 rounded-3 d-flex"
+                role="tablist">
                 <button
+                    class="btn bg-custom-tab shadow-sm text-dark fw-bold flex-fill active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#pending-tab"
                     type="button"
-                    class="btn btn-light shadow-sm text-dark fw-bold">
-                    Pending (1)
+                    role="tab">
+                    Pending ({{ tasks|length }})
                 </button>
                 <button
+                    class="btn btn-link text-decoration-none text-muted flex-fill"
+                    data-bs-toggle="tab"
+                    data-bs-target="#progress-tab"
                     type="button"
-                    class="btn btn-link text-decoration-none text-muted">
-                    In Progress (1)
+                    role="tab">
+                    In Progress ({{ in_progress_tasks|length }})
                 </button>
                 <button
+                    class="btn btn-link text-decoration-none text-muted flex-fill"
+                    data-bs-toggle="tab"
+                    data-bs-target="#completed-tab"
                     type="button"
-                    class="btn btn-link text-decoration-none text-muted">
-                    Completed (1)
+                    role="tab">
+                    Completed ({{ completed_tasks|length }})
                 </button>
             </div>
-            {% for task in tasks %}
-            <div class="tasks-list">
+            <div class="tab-content">
                 <div
-                    class="task-card p-3 mb-3 {% if task.priority == 'High' %}border-danger{% endif %}">
-                    <div
-                        class="d-flex justify-content-between align-items-start mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            {% if task.priority == "High" %}
-                            <h3 class="h6 fw-bold m-0" style="color: #dc3545">
-                                {{ task.task }}
-                            </h3>
-                            <i
-                                class="fa-solid fa-circle-exclamation text-danger me-1"
-                                title="High Priority"></i>
-                            {% elif task.priority == "Medium" %}
-                            <h3 class="h6 fw-bold m-0" style="color: #fd7d14">
-                                {{ task.task }}
-                            </h3>
-                            {% else %}
-                            <h3 class="h6 fw-bold m-0" style="color: #198754">
-                                {{ task.task }}
-                            </h3>
-                            {% endif %}
+                    class="tab-pane fade show active"
+                    id="pending-tab"
+                    role="tabpanel">
+                    {% for task in tasks %}
+                    <div class="tasks-list">
+                        <div
+                            class="task-card p-3 mb-3 {% if task.priority == 'High' %}border-danger{% endif %}">
+                            <div
+                                class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if task.priority == "High" %}
+                                    <h3
+                                        class="h6 fw-bold m-0"
+                                        style="color: #dc3545">
+                                        {{ task.task }}
+                                    </h3>
+                                    {% elif task.priority == "Medium" %}
+                                    <h3
+                                        class="h6 fw-bold m-0"
+                                        style="color: #fd7d14">
+                                        {{ task.task }}
+                                    </h3>
+                                    {% else %}
+                                    <h3
+                                        class="h6 fw-bold m-0"
+                                        style="color: #198754">
+                                        {{ task.task }}
+                                    </h3>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex gap-1">
+                                    <a
+                                        href="{% url 'update_status' task.id 'In Progress' %}"
+                                        class="btn btn-light btn-sm"
+                                        title="Start Task">
+                                        <i
+                                            class="fa-regular fa-circle-play"></i>
+                                    </a>
+                                    <button class="btn btn-light btn-sm">
+                                        <i
+                                            class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-4 text-muted small mb-3">
+                                <span
+                                    ><i class="fa-regular fa-clock me-1"></i>
+                                    {{task.duration|default:"30" }} min</span
+                                >
+                                <span
+                                    ><i class="fa-regular fa-calendar me-1"></i>
+                                    {{ task.deadline|date:"M d, Y" }}</span
+                                >
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                {% if task.priority == 'High' %}
+                                <span
+                                    class="tag"
+                                    style="
+                                        background-color: #f8d7da;
+                                        color: #dc3545;
+                                    ">
+                                    {{ task.priority }}
+                                </span>
+                                {% elif task.priority == 'Medium' %}
+                                <span
+                                    class="tag"
+                                    style="
+                                        background-color: #fff3cd;
+                                        color: #856404;
+                                    ">
+                                    {{ task.priority }}
+                                </span>
+                                {% else %}
+                                <span
+                                    class="tag"
+                                    style="
+                                        background-color: #d1e7dd;
+                                        color: #0f5132;
+                                    ">
+                                    {{ task.priority }}
+                                </span>
+                                {% endif %}
+
+                                <span class="tag pending"
+                                    >{{ task.status }}</span
+                                >
+                            </div>
                         </div>
-
-                        <div class="d-flex gap-1">
-                            <button class="btn btn-light btn-sm">
-                                <i class="fa-regular fa-circle-play"></i>
-                            </button>
-                            <button class="btn btn-light btn-sm">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i
+                            class="fa-solid fa-check-circle fs-1 mb-3 text-light"></i>
+                        <p>No pending tasks. You're all caught up!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane fade" id="progress-tab" role="tabpanel">
+                    {% for task in in_progress_tasks %}
+                    <div class="tasks-list">
+                        <div class="task-card p-3 mb-3">
+                            <div
+                                class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h3
+                                        class="h6 fw-bold m-0"
+                                        style="color: #fd7d14">
+                                        {{ task.task }}
+                                    </h3>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <a
+                                        href="{% url 'update_status' task.id 'Completed' %}"
+                                        class="btn btn-light btn-sm"
+                                        title="Complete Task">
+                                        <i
+                                            class="fa-solid fa-check text-success"></i>
+                                    </a>
+                                    <button class="btn btn-light btn-sm">
+                                        <i
+                                            class="fa-solid fa-ellipsis-vertical"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span
+                                    class="tag"
+                                    style="
+                                        background-color: #fff3cd;
+                                        color: #856404;
+                                    "
+                                    >{{ task.status }}</span
+                                >
+                            </div>
                         </div>
                     </div>
-
-                    <div class="d-flex gap-4 text-muted small mb-3">
-                        <span
-                            ><i class="fa-regular fa-clock me-1"></i> {{ task.duration|default:"30" }} min</span
-                        >
-                        <span
-                            ><i class="fa-regular fa-calendar me-1"></i> 
-                            {{ task.deadline|date:"M d, Y" }}</span
-                        >
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <p>No tasks currently in progress.</p>
                     </div>
-
-                    <div class="d-flex gap-2">
-                        {% if task.priority == 'High' %}
-                        <span
-                            class="tag"
-                            style="background-color: #f8d7da; color: #dc3545">
-                            {{ task.priority }}
-                        </span>
-                        {% elif task.priority == 'Medium' %}
-                        <span
-                            class="tag"
-                            style="background-color: #fff3cd; color: #856404">
-                            {{ task.priority }}
-                        </span>
-                        {% else %}
-                        <span
-                            class="tag"
-                            style="background-color: #d1e7dd; color: #0f5132">
-                            {{ task.priority }}
-                        </span>
-                        {% endif %}
-                        <span class="tag pending">pending</span>
+                    {% endfor %}
+                </div>
+                <div class="tab-pane fade" id="completed-tab" role="tabpanel">
+                    {% for task in completed_tasks %}
+                    <div class="tasks-list">
+                        <div
+                            class="task-card p-3 mb-3 border-success opacity-75">
+                            <div
+                                class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h3 class="h6 fw-bold m-0 text-success">
+                                        <del>{{ task.task }}</del>
+                                    </h3>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <a
+                                        href="{% url 'update_status' task.id 'Pending' %}"
+                                        class="btn btn-light btn-sm"
+                                        title="Undo Task">
+                                        <i
+                                            class="fa-solid fa-rotate-left text-muted"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="tag bg-success text-white"
+                                    >{{ task.status }}</span
+                                >
+                            </div>
+                        </div>
                     </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <p>No completed tasks yet. Let's get to work!</p>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
         </main>
 
         <div class="modal fade" id="taskModal" tabindex="-1">
@@ -318,16 +441,51 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                // Target your specific modal
+                /* --- 1. Form Reset Script --- */
                 const taskModal = document.getElementById("taskModal");
+                if (taskModal) {
+                    taskModal.addEventListener("hidden.bs.modal", function () {
+                        const form = taskModal.querySelector("form");
+                        if (form) form.reset();
+                    });
+                }
 
-                // Listen for Bootstrap's 'hidden' event (when the modal completely closes)
-                taskModal.addEventListener("hidden.bs.modal", function () {
-                    // Find the form inside the modal and trigger a reset
-                    const form = taskModal.querySelector("form");
-                    if (form) {
-                        form.reset();
-                    }
+                /* --- 2. Tab Button Class Swap Script --- */
+                // Grab all your tab buttons
+                const tabButtons = document.querySelectorAll(
+                    'button[data-bs-toggle="tab"]',
+                );
+
+                tabButtons.forEach((button) => {
+                    // Listen for Bootstrap's built-in tab switch event
+                    button.addEventListener("shown.bs.tab", function (event) {
+                        // The button you just clicked (make it look active)
+                        event.target.classList.remove(
+                            "btn-link",
+                            "text-decoration-none",
+                            "text-muted",
+                        );
+                        event.target.classList.add(
+                            "bg-custom-tab",
+                            "shadow-sm",
+                            "text-dark",
+                            "fw-bold",
+                        );
+                        // The button that used to be active (make it look inactive)
+                        if (event.relatedTarget) {
+                            event.relatedTarget.classList.remove(
+                                "bg-custom-tab",
+                                "shadow-sm",
+                                "text-dark",
+                                "fw-bold",
+                            );
+                            event.relatedTarget.classList.add(
+                                "btn-link",
+                                "text-decoration-none",
+                                "text-muted",
+                            );
+                        }
+                    });
                 });
             });
         </script>

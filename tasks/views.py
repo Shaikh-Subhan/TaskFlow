@@ -1,10 +1,14 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from . models import Task
 
 def tasks(request):
-    tasks = Task.objects.filter(is_completed = False).order_by('deadline')
+    pending_tasks = Task.objects.filter(status='Pending').order_by('deadline')
+    in_progress_tasks = Task.objects.filter(status='In Progress')
+    completed_tasks = Task.objects.filter(status='Completed')
     contex = {
-        'tasks':tasks,
+        'tasks':pending_tasks,
+        'in_progress_tasks': in_progress_tasks,
+        'completed_tasks': completed_tasks,
     }
     return render(request, 'tasks.html',contex)
 
@@ -27,4 +31,12 @@ def addtask(request):
             duration=task_duration
         )
         return redirect('tasks') 
+    return redirect('tasks')
+
+def update_status(request, task_id, new_status):
+    valid_statuses = ['Pending', 'In Progress', 'Completed']
+    if new_status in valid_statuses:
+        task = get_object_or_404(Task, id=task_id)
+        task.status = new_status
+        task.save()
     return redirect('tasks')
