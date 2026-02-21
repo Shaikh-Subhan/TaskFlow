@@ -1,0 +1,342 @@
+:root {
+    --bg-light: #f4f8fb;
+    --primary: #4361ee;
+    --text-dark: #333;
+    --text-muted: #64748b;
+    --sidebar-width: 240px;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* --- Branding & Custom Utilities --- */
+.text-primary-custom {
+    color: var(--primary);
+}
+.brand-name {
+    color: var(--primary);
+    font-weight: 700;
+}
+.bg-primary-custom {
+    background-color: #0f172a;
+    color: white;
+}
+.bg-primary-custom:hover {
+    background-color: #1e293b;
+    color: white;
+}
+
+/* Custom Shadows & Radius */
+.card-custom {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+.card-custom:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(67, 97, 238, 0.15);
+    transform: translateY(-5px);
+}
+
+/* --- Sidebar (Desktop Fixed, Mobile Offcanvas) --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #fff;
+    border-right: 1px solid #f0f0f0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.content-area {
+    margin-left: var(--sidebar-width);
+    padding: 40px 50px;
+    transition: margin-left 0.3s;
+}
+
+/* Mobile Sidebar Adjustments */
+@media (max-width: 768px) {
+    .content-area {
+        margin-left: 0;
+        padding: 20px;
+    }
+    .sidebar {
+        display: none;
+    } /* Hidden by default on mobile, shown via Offcanvas */
+}
+/* Ensure the sidebar doesn't block interactions on mobile */
+@media (max-width: 768px) {
+    .offcanvas-backdrop {
+        /* This ensures the backdrop disappears instantly when navigating */
+        display: none !important; 
+    }
+    
+    .sidebar.offcanvas-md {
+        /* Ensures the sidebar is always on top of other content */
+        z-index: 1050 !important;
+    }
+}
+
+/* Fix for mobile top edge visibility */
+@media (max-width: 768px) {
+    body {
+        /* Adjust 60px based on the height of your mobile header */
+        padding-top: 60px !important;
+    }
+    
+    .content-area {
+        padding-top: 20px !important;
+    }
+}
+/* Specific fix for the Sidebar/Menu top overlap on mobile */
+@media (max-width: 768px) {
+    .sidebar.offcanvas {
+        padding-top: 25px !important; /* Pushes the 'TaskFlow' logo down so it doesn't hit the edge */
+    }
+    
+    .sidebar .brand-area, 
+    .sidebar .px-4 {
+        margin-top: 20px; /* Extra breathing room for the brand name */
+    }
+}
+
+.nav-link {
+    color: var(--text-dark);
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+}
+.nav-link.active {
+    background-color: #0f172a;
+    color: #fff;
+}
+.nav-link:hover:not(.active) {
+    background-color: #f8f9fa;
+    color: var(--text-dark);
+}
+.logout-link {
+    color: #ef4444;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 12px 15px;
+    display: block;
+}
+
+/* --- Specific Page Elements --- */
+
+/* Landing Page Icons */
+.icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 20px;
+}
+.icon-box.blue {
+    background-color: #0096ff;
+}
+.icon-box.green {
+    background-color: #00c853;
+}
+.icon-box.purple {
+    background-color: #d500f9;
+}
+.icon-box.orange {
+    background-color: #ff3d00;
+}
+
+/* Feature List Bullets */
+.features-list {
+    list-style: none;
+    padding-left: 0;
+    text-align: left;
+}
+.features-list li {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 15px;
+}
+.features-list li::before {
+    content: "•";
+    color: var(--primary);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Benefits Icons */
+.benefit-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+.benefit-icon.light-blue {
+    background-color: #e3f2fd;
+    color: #2196f3;
+}
+.benefit-icon.light-green {
+    background-color: #e8f5e9;
+    color: #4caf50;
+}
+.benefit-icon.light-purple {
+    background-color: #f3e5f5;
+    color: #9c27b0;
+}
+
+/* Alerts & Status */
+.cram-alert-box {
+    background-color: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: 12px;
+    color: #c53030;
+}
+.normal-box {
+    background-color: #fffef5;
+    border: 1px solid #feefb2;
+    border-radius: 12px;
+    color: #c58a30;
+}
+.cram-badge {
+    background-color: #be123c;
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+/* Charts & Stats */
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+.stat-number.green {
+    color: #22c55e;
+}
+.stat-number.blue {
+    color: #3b82f6;
+}
+
+/* Pure CSS Chart Lines (kept from original) */
+.chart-area {
+    position: relative;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.grid-line {
+    border-top: 1px dashed #e2e8f0;
+    width: 100%;
+    position: relative;
+    height: 20%;
+}
+.grid-line span {
+    position: absolute;
+    left: -20px;
+    top: -10px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+.pie-chart-circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(#0096ff 0% 100%);
+    margin: 0 auto 20px;
+}
+
+/* Toggle Switch */
+.form-switch .form-check-input {
+    width: 3em;
+    height: 1.5em;
+}
+
+/* Tasks */
+.task-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: 0.2s;
+    background: #fff;
+}
+.task-card.cram-active {
+    border-color: #ef4444;
+}
+.tag {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+.tag.medium {
+    background-color: #fef9c3;
+    color: #a16207;
+}
+.tag.pending {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+.tag.type {
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+
+/* =========================================
+   CUSTOM FORM ELEMENT COLORS (Primary Custom)
+========================================= */
+
+/* --- 1. Bootstrap Switch --- */
+/* Changes the toggle background when turned ON to #0f172a */
+.form-check-input:checked {
+    background-color: #131d35; 
+    border-color: #131d35;
+}
+
+/* Changes the glow ring when you click/focus the switch */
+.form-check-input:focus {
+    border-color: #131d35;
+    /* Uses an RGBA version of #0f172a for a soft shadow effect */
+    box-shadow: 0 0 0 0.25rem rgba(15, 23, 42, 0.25);
+}
+
+
+/* --- 2. Selection List (Dropdown) --- */
+/* Changes the border and glow ring when you click the dropdown */
+.form-select:focus {
+    color: #131d35;
+    border-color: #131d35;
+    box-shadow: 0 0 0 0.25rem rgba(15, 23, 42, 0.25);
+}
+
+
+/* --- 3. Calendar (Date Picker) --- */
+/* Changes the highlight color inside the browser's native popup calendar */
+input[type="date"] {
+    accent-color: #131d35;;
+}
+
+/* Changes the color of the little calendar icon on the right to match #0f172a */
+::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* This specific filter converts the default icon to your dark #0f172a color */
+    filter: invert(7%) sepia(21%) saturate(2206%) hue-rotate(185deg) brightness(96%) contrast(93%);
+}

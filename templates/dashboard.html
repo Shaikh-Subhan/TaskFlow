@@ -1,0 +1,172 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard - TaskFlow</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="{% static 'css/style.css'%}" />
+    </head>
+    <body>
+        <div
+            class="d-md-none p-3 bg-white border-bottom d-flex justify-content-between align-items-center fixed-top">
+            <div class="d-flex align-items-center gap-1">
+                <img
+                    src="{% static 'image/Tasklogo.png' %}"
+                    alt="Logo"
+                    style="width: 35px; object-fit: contain" />
+                <h1 class="h3 fw-bold m-0 brand-name">TaskFlow</h1>
+            </div>
+            <button
+                class="btn btn-light"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarMenu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <aside
+            class="sidebar offcanvas-md offcanvas-start d-flex flex-column py-4"
+            tabindex="-1"
+            id="sidebarMenu">
+            <div class="px-4 mb-4">
+                <div class="d-flex align-items-center gap-1 mb-2">
+                    <img
+                            src="{% static 'image/Tasklogo.png' %}"
+                            alt="Logo"
+                            style="width: 40px; object-fit: contain" />
+                    <h1 class="h3 fw-bold m-0 brand-name">
+                        TaskFlow
+                    </h1>
+                </div>
+                <div class="d-flex align-items-center text-muted small">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>
+                    <span>Student</span>
+                </div>
+                <div class="small text-secondary fw-bold">Demo User</div>
+            </div>
+
+            <nav class="nav flex-column px-3 flex-grow-1">
+                <a href="{% url 'dashboard'%}" class="nav-link active">
+                    <i class="fa-solid fa-grip-vertical me-2 w-25px"></i>
+                    Dashboard
+                </a>
+                <a href="{% url 'tasks'%}" class="nav-link">
+                    <i class="fa-solid fa-list-check me-2 w-25px"></i> Tasks
+                </a>
+                <a href="analytics.html" class="nav-link">
+                    <i class="fa-solid fa-chart-line me-2 w-25px"></i> Analytics
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fa-solid fa-gear me-2 w-25px"></i> Settings
+                </a>
+            </nav>
+
+            <div class="px-3 mt-auto">
+                <a href="index.html" class="logout-link"
+                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>
+                    Logout</a
+                >
+            </div>
+        </aside>
+
+        <main class="content-area pt-5 pt-md-4">
+            <header class="mb-4 pb-3 border-bottom">
+                <h2 class="h3 fw-bold">Dashboard</h2>
+                <p class="text-muted small m-0">Sunday, January 18, 2026</p>
+            </header>
+            {% for task in tasks%}
+            <section class="normal-box p-3 mb-4">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                    <div>
+                        <!-- <strong class="d-block">Normal Mode</strong> -->
+                        <span class="small"
+                            >You have 1 task(s) due within {{ task.deadline}} hours</span
+                        >
+                    </div>
+                </div>
+                <div
+                    class="bg-white border rounded p-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold small">{{ task.task}}</span>
+                    <span class="badge bg-warning text-dark rounded-pill"
+                        >Due 7:20 PM</span
+                    >
+                </div>
+            </section>
+            {% endfor %}
+            <!-- <section class="cram-alert-box p-3 mb-4">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                    <div>
+                        <strong class="d-block">Cram Mode Active!</strong>
+                        <span class="small">You have 1 Exam on 02/02/2026</span>
+                    </div>
+                </div>
+                <div
+                    class="bg-white border rounded p-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold small">Sessional 2</span>
+                    <span class="badge bg-danger rounded-pill"
+                        >Due 02/02/2026</span
+                    >
+                </div>
+            </section> -->
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-light shadow-sm p-4 h-100">
+                        <label class="text-muted small fw-bold mb-2"
+                            >Upcoming Exams</label
+                        >
+                        <div class="display-6 fw-bold">1</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-light shadow-sm p-4 h-100">
+                        <label class="text-muted small fw-bold mb-2"
+                            >Pending Assignments</label
+                        >
+                        <div class="display-6 fw-bold">1</div>
+                        <span class="small text-muted mt-2">Next: Jan 19</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-light shadow-sm p-4 h-100">
+                        <label class="text-muted small fw-bold mb-2"
+                            >Total Study Time</label
+                        >
+                        <div class="display-6 fw-bold">2h</div>
+                        <span class="small text-muted mt-2"
+                            >1 tasks completed</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-light shadow-sm p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <i class="fa-solid fa-book-open fs-4 text-primary"></i>
+                    <div>
+                        <h3 class="h6 fw-bold m-0">Time by Subject</h3>
+                        <p class="small text-muted m-0">
+                            See which subjects are taking most of your time
+                        </p>
+                    </div>
+                </div>
+                <div class="text-center text-muted py-4 small">
+                    No subject data available yet. Complete some tasks to see
+                    statistics.
+                </div>
+            </div>
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

@@ -1,0 +1,160 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Welcome to TaskFlow</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="{% static 'css/style.css'%}" />
+    </head>
+    <body>
+        <div class="container py-5 text-center">
+            <header class="mb-5">
+                <h1 class="display-5 fw-bold text-primary-custom">
+                    Welcome to <span class="brand-name">TaskFlow</span>
+                </h1>
+                <p class="fs-5 text-muted mb-2">
+                    Your intelligent task management system that adapts to your
+                    workflow
+                </p>
+                <p class="text-secondary">Select your role to get started</p>
+            </header>
+
+            <div class="row g-4 justify-content-center mb-5">
+                <div class="col-md-6 col-lg-3">
+                    <a
+                        href="login.html"
+                        class="card-custom h-100 p-4 text-decoration-none d-flex flex-column align-items-center">
+                        <div class="icon-box blue">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="h5 text-dark mb-3">Student</h3>
+                        <p class="small text-muted text-center mb-3">
+                            Manage assignments, exams, and study schedules
+                        </p>
+                        <ul class="features-list w-100 flex-grow-1">
+                            <li>Assignment tracking</li>
+                            <li>Exam preparation</li>
+                            <li>Subject-wise analysis</li>
+                            <li>Cram mode alerts</li>
+                        </ul>
+                        <button
+                            class="btn btn-outline-secondary w-100 btn-sm fw-bold">
+                            Continue
+                        </button>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a
+                        href="login.html"
+                        class="card-custom h-100 p-4 text-decoration-none d-flex flex-column align-items-center">
+                        <div class="icon-box green">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                        </div>
+                        <h3 class="h5 text-dark mb-3">Teacher</h3>
+                        <p class="small text-muted text-center mb-3">
+                            Organize lesson plans, grading, and tasks
+                        </p>
+                        <ul class="features-list w-100 flex-grow-1">
+                            <li>Recurring tasks</li>
+                            <li>Batch grading</li>
+                            <li>Deep work blocks</li>
+                            <li>Lesson planning</li>
+                        </ul>
+                        <button
+                            class="btn btn-outline-secondary w-100 btn-sm fw-bold">
+                            Continue
+                        </button>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a
+                        href="login.html"
+                        class="card-custom h-100 p-4 text-decoration-none d-flex flex-column align-items-center">
+                        <div class="icon-box purple">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <h3 class="h5 text-dark mb-3">Corporate</h3>
+                        <p class="small text-muted text-center mb-3">
+                            Balance meetings, projects, and deliverables
+                        </p>
+                        <ul class="features-list w-100 flex-grow-1">
+                            <li>Meeting management</li>
+                            <li>Project milestones</li>
+                            <li>Daily reports</li>
+                            <li>Team collaboration</li>
+                        </ul>
+                        <button
+                            class="btn btn-outline-secondary w-100 btn-sm fw-bold">
+                            Continue
+                        </button>
+                    </a>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <a
+                        href="login.html"
+                        class="card-custom h-100 p-4 text-decoration-none d-flex flex-column align-items-center">
+                        <div class="icon-box orange">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <h3 class="h5 text-dark mb-3">Entrepreneur</h3>
+                        <p class="small text-muted text-center mb-3">
+                            Prioritize high-value tasks and strategy
+                        </p>
+                        <ul class="features-list w-100 flex-grow-1">
+                            <li>ROI-based priorities</li>
+                            <li>Delegate tasks</li>
+                            <li>Strategic planning</li>
+                            <li>Value tracking</li>
+                        </ul>
+                        <button
+                            class="btn btn-outline-secondary w-100 btn-sm fw-bold">
+                            Continue
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <div
+                class="card border-0 shadow-sm p-4 mx-auto"
+                style="max-width: 900px">
+                <h2 class="h4 mb-4">Why TaskFlow?</h2>
+                <div class="row g-4 justify-content-center">
+                    <div class="col-4 col-md-3">
+                        <div class="benefit-icon light-blue mx-auto mb-2">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <span class="small fw-bold text-muted"
+                            >Smart Prioritization</span
+                        >
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <div class="benefit-icon light-green mx-auto mb-2">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+                        <span class="small fw-bold text-muted">Analytics</span>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <div class="benefit-icon light-purple mx-auto mb-2">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <span class="small fw-bold text-muted"
+                            >Energy Optimization</span
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
