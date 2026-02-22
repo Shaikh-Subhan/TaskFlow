@@ -277,9 +277,6 @@ body {
     transition: 0.2s;
     background: #fff;
 }
-.task-card.cram-active {
-    border-color: #ef4444;
-}
 .tag {
     font-size: 0.75rem;
     padding: 4px 12px;
@@ -299,52 +296,23 @@ body {
     color: #475569;
 }
 
-
-/* =========================================
-   CUSTOM FORM ELEMENT COLORS (Primary Custom)
-========================================= */
-
-/* --- 1. Bootstrap Switch --- */
-/* Changes the toggle background when turned ON to #0f172a */
-.form-check-input:checked {
-    background-color: #131d35; 
-    border-color: #131d35;
+.list:hover, 
+.list:focus {
+    background-color: #d1d8e7 !important; 
+    color: #0f172a !important;
 }
 
-/* Changes the glow ring when you click/focus the switch */
-.form-check-input:focus {
-    border-color: #131d35;
-    /* Uses an RGBA version of #0f172a for a soft shadow effect */
-    box-shadow: 0 0 0 0.25rem rgba(15, 23, 42, 0.25);
+/* When you actively click/hold the item */
+.list:active, 
+.list.active {
+    background-color: #d1d8e7 !important; 
+    color: #0f172a !important;
 }
 
-
-/* --- 2. Selection List (Dropdown) --- */
-/* Changes the border and glow ring when you click the dropdown */
-.form-select:focus {
-    color: #131d35;
-    border-color: #131d35;
-    box-shadow: 0 0 0 0.25rem rgba(15, 23, 42, 0.25);
+.form-select option:hover{
+    background-color: #d1d8e7 !important; 
+    color: #0f172a !important;
 }
-
-
-/* --- 3. Calendar (Date Picker) --- */
-/* Changes the highlight color inside the browser's native popup calendar */
-input[type="date"] {
-    accent-color: #131d35;;
-}
-
-/* Changes the color of the little calendar icon on the right to match #0f172a */
-::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    /* This specific filter converts the default icon to your dark #0f172a color */
-    filter: invert(7%) sepia(21%) saturate(2206%) hue-rotate(185deg) brightness(96%) contrast(93%);
-}
-
 .bg-custom-tab {
-    background-color: #d1d8e7 !important;
-}
-
-.bg-custom-tab :hover:not(.active){
     background-color: #d1d8e7 !important;
 }
