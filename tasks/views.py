@@ -1,19 +1,11 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from . models import Task
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+
 from django.utils import timezone
 
-def tasks(request):
-    pending_tasks = Task.objects.filter(status='Pending').order_by('deadline')
-    in_progress_tasks = Task.objects.filter(status='In Progress')
-    completed_tasks = Task.objects.filter(status='Completed')
-    contex = {
-        'tasks':pending_tasks,
-        'in_progress_tasks': in_progress_tasks,
-        'completed_tasks': completed_tasks,
-    }
-    return render(request, 'tasks.html',contex)
-
+@login_required(login_url='login')
 def addtask(request):
     if request.method == "POST":
         task_name = request.POST.get('task')
@@ -35,6 +27,7 @@ def addtask(request):
         return redirect('tasks') 
     return redirect('tasks')
 
+@login_required(login_url='login')
 def update_status(request, task_id, new_status):
     valid_statuses = ['Pending', 'In Progress', 'Completed']
     if new_status in valid_statuses:
@@ -53,11 +46,13 @@ def update_status(request, task_id, new_status):
             return redirect(reverse('tasks') + '#pending-tab')
     return redirect('tasks')
 
+@login_required(login_url='login')
 def delete_task(request, task_id):
     task = get_object_or_404(Task,id=task_id)
     task.delete()
     return redirect('tasks')
 
+@login_required(login_url='login')
 def edit_task(request, task_id):
     if request.method == "POST":
         task = get_object_or_404(Task, id=task_id)

@@ -316,3 +316,9 @@ body {
 .bg-custom-tab {
     background-color: #d1d8e7 !important;
 }
+
+.custom-strikethrough {
+  color: #198754;
+  text-decoration-line: line-through;
+  text-decoration-color: #0f0c0c; 
+}

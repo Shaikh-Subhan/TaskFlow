@@ -48,9 +48,12 @@
                 </div>
                 <div class="d-flex align-items-center text-muted small">
                     <i class="fa-solid fa-graduation-cap me-2"></i>
-                    <span>Student</span>
+                    {# role was stored in user.first_name temporarily; use correct attribute name #}
+                    <span>{{ user.first_name|default:"Role not set"|capfirst }}</span>
                 </div>
-                <div class="small text-secondary fw-bold">Demo User</div>
+                <div class="small text-secondary fw-bold">
+                    <span>{{ user.username|default:"(no username)" }}</span>
+                </div>
             </div>
 
             <nav class="nav flex-column px-3 flex-grow-1">
@@ -61,16 +64,16 @@
                 <a href="{% url 'tasks'%}" class="nav-link">
                     <i class="fa-solid fa-list-check me-2 w-25px"></i> Tasks
                 </a>
-                <a href="analytics.html" class="nav-link">
+                <a href="{% url 'analytics' %}" class="nav-link">
                     <i class="fa-solid fa-chart-line me-2 w-25px"></i> Analytics
                 </a>
-                <a href="settings.html" class="nav-link">
+                <a href="{% url 'settings' %}" class="nav-link">
                     <i class="fa-solid fa-gear me-2 w-25px"></i> Settings
                 </a>
             </nav>
 
             <div class="px-3 mt-auto">
-                <a href="index.html" class="logout-link"
+                <a href="{% url 'logout' %}" class="logout-link"
                     ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>
                     Logout</a
                 >
@@ -78,9 +81,9 @@
         </aside>
 
         <main class="content-area pt-5 pt-md-4">
-            <header class="mb-4 pb-3 border-bottom">
+                <header class="mb-4 pb-3 border-bottom">
                 <h2 class="h3 fw-bold">Dashboard</h2>
-                <p class="text-muted small m-0">Sunday, January 18, 2026</p>
+                <p class="text-muted small m-0">{% now "l, F j, Y" %}</p>
             </header>
             {% for task in tasks%}
             <section class="normal-box p-3 mb-4">
@@ -102,22 +105,7 @@
                 </div>
             </section>
             {% endfor %}
-            <!-- <section class="cram-alert-box p-3 mb-4">
-                <div class="d-flex align-items-start gap-3 mb-3">
-                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
-                    <div>
-                        <strong class="d-block">Cram Mode Active!</strong>
-                        <span class="small">You have 1 Exam on 02/02/2026</span>
-                    </div>
-                </div>
-                <div
-                    class="bg-white border rounded p-2 d-flex justify-content-between align-items-center">
-                    <span class="fw-bold small">Sessional 2</span>
-                    <span class="badge bg-danger rounded-pill"
-                        >Due 02/02/2026</span
-                    >
-                </div>
-            </section> -->
+
 
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
