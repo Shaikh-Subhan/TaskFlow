@@ -328,13 +328,13 @@ body {
   text-decoration-color: #0f0c0c; 
 }
 
-/* =========================================================
+/* /* =========================================================
    MASTER DARK MODE FIXES (Shadows, Hovers, & Inputs)
    Paste this at the VERY BOTTOM of style.css
-========================================================= */
+=========================================================
 
-/* 1. FIX INVISIBLE SHADOWS */
-/* Shadows don't show on dark backgrounds, so we use borders instead */
+/* 1. FIX INVISIBLE SHADOWS
+/* Shadows don't show on dark backgrounds, so we use borders instead
 [data-bs-theme="dark"] .shadow-sm,
 [data-bs-theme="dark"] .shadow,
 [data-bs-theme="dark"] .card,
@@ -343,50 +343,50 @@ body {
     border: none;
 }
 
-/* 2. FIX SIDEBAR & NAV HOVER EFFECTS */
-/* Makes non-active links light grey */
+/* 2. FIX SIDEBAR & NAV HOVER EFFECTS
+/* Makes non-active links light grey 
 [data-bs-theme="dark"] .nav-link {
     color: #cbd5e1 !important; 
 }
 
-/* When you HOVER over a link, make it a nice subtle grey */
+/* When you HOVER over a link, make it a nice subtle grey 
 [data-bs-theme="dark"] .nav-link:hover {
     color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1) !important; /* 10% White */
+    background-color: rgba(255, 255, 255, 0.1) !important; /* 10% White 
 }
 
-/* Keep the ACTIVE link blue and white */
+/* Keep the ACTIVE link blue and white 
 [data-bs-theme="dark"] .nav-link.active {
     color: #ffffff !important;
     background-color: #2a3d9c !important;
 }
 
-/* 3. FIX BRIGHT INPUTS (With !important to force it) */
+/* 3. FIX BRIGHT INPUTS (With !important to force it) 
 [data-bs-theme="dark"] .form-control,
 [data-bs-theme="dark"] .form-select {
-    background-color: #1e293b !important; /* Dark Blue-Grey */
+    background-color: #1e293b !important; /* Dark Blue-Grey
     border-color: #334155 !important;
     color: #f1f5f9 !important;
 }
 
-/* Fix the dropdown options background */
+/* Fix the dropdown options background
 [data-bs-theme="dark"] .form-select option {
     background-color: #1e293b;
     color: #f1f5f9;
 }
 
-/* Fix Placeholder Text */
+/* Fix Placeholder Text 
 [data-bs-theme="dark"] ::placeholder {
-    color: #94a3b8 !important; /* Readable Grey */
+    color: #94a3b8 !important; /* Readable Grey 
     opacity: 1;
 }
 
-/* 4. FIX "BTN-LIGHT" (The 3-dots button) */
-/* In dark mode, "light" buttons should be dark grey, not white */
+/* 4. FIX "BTN-LIGHT" (The 3-dots button) 
+/* In dark mode, "light" buttons should be dark grey, not white
 [data-bs-theme="dark"] .btn-light {
     background-color: #1e293b !important;
     color: #f1f5f9 !important;
 }
 [data-bs-theme="dark"] .btn-light:hover {
-    background-color: #334155 !important; /* Slightly lighter on hover */
-}
+    background-color: #334155 !important; /* Slightly lighter on hover 
+} */
