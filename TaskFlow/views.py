@@ -75,7 +75,6 @@ def register(request):
 
     return render(request,'signup.html')
 
-
 def login(request):
     if request.method == 'POST':
         uname = request.POST.get('username')
@@ -101,38 +100,6 @@ def logout(request):
     auth_logout(request)
     messages.success(request, 'You have been logged out successfully')
     return redirect('home')
-
-@login_required(login_url='login')
-def inprogress(request):
-    all_tasks = Task.objects.all()
-    pending_tasks = all_tasks.filter(status='pending')
-    in_progress_tasks = all_tasks.filter(status='in_progress')
-    completed_tasks = all_tasks.filter(status='completed')
-    
-    context = {
-        'tasks': in_progress_tasks,
-        'pending_count': pending_tasks.count(),
-        'in_progress_count': in_progress_tasks.count(),
-        'completed_count': completed_tasks.count(),
-        'current_status': 'in_progress',
-    }
-    return render(request, 'inprogress.html', context)
-
-@login_required(login_url='login')
-def completed(request):
-    all_tasks = Task.objects.all()
-    pending_tasks = all_tasks.filter(status='pending')
-    in_progress_tasks = all_tasks.filter(status='in_progress')
-    completed_tasks = all_tasks.filter(status='completed')
-    
-    context = {
-        'tasks': completed_tasks,
-        'pending_count': pending_tasks.count(),
-        'in_progress_count': in_progress_tasks.count(),
-        'completed_count': completed_tasks.count(),
-        'current_status': 'completed',
-    }
-    return render(request, 'completed.html', context)
 
 @login_required(login_url='login')
 def analytics(request):

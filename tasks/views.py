@@ -24,7 +24,7 @@ def addtask(request):
             deadline=task_deadline,
             duration=task_duration
         )
-        return redirect('tasks') 
+        return redirect('tasks')
     return redirect('tasks')
 
 @login_required(login_url='login')
