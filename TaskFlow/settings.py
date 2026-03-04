@@ -77,6 +77,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'CONN_MAX_AGE': 600,  # Connection pooling for better performance
+    }
+}
+
+# Cache configuration for better performance
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'taskflow-cache',
+        'TIMEOUT': 300,  # 5 minutes cache timeout
     }
 }
 
@@ -116,7 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR/'static'
+STATIC_ROOT = BASE_DIR / 'static'
 STATICFILES_DIRS = [
-    'TaskFlow/static',
+    BASE_DIR / 'TaskFlow' / 'static',
 ]

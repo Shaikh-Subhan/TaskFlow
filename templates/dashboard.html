@@ -1,81 +1,262 @@
-{% extends 'base.html' %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard - TaskFlow</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link rel="stylesheet" href="{% static 'css/style.css'%}" />
+    </head>
+    <body>
+        <div
+            class="d-md-none p-3 bg-white border-bottom d-flex justify-content-between align-items-center fixed-top">
+            <div class="d-flex align-items-center gap-1">
+                <img
+                    src="{% static 'image/Tasklogo.png' %}"
+                    alt="Logo"
+                    style="width: 35px; object-fit: contain" />
+                <h1 class="h3 fw-bold m-0 brand-name">TaskFlow</h1>
+            </div>
+            <button
+                class="btn btn-light"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarMenu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
 
-{% block title %}Dashboard - TaskFlow{% endblock %}
+        <aside
+            class="sidebar offcanvas-md offcanvas-start d-flex flex-column py-4"
+            tabindex="-1"
+            id="sidebarMenu">
+            <div class="px-4 mb-4">
+                <div class="d-flex align-items-center gap-1 mb-2">
+                    <img
+                            src="{% static 'image/Tasklogo.png' %}"
+                            alt="Logo"
+                            style="width: 40px; object-fit: contain" />
+                    <h1 class="h3 fw-bold m-0 brand-name">
+                        TaskFlow
+                    </h1>
+                </div>
+                <div class="d-flex align-items-center text-muted small">
+                    <i class="fa-solid fa-graduation-cap me-2"></i>
+                    {# role was stored in user.first_name temporarily; use correct attribute name #}
+                    <span>{{ user.first_name|default:"Role not set"|capfirst }}</span>
+                </div>
+                <div class="small text-secondary fw-bold">
+                    <span>{{ user.username|default:"(no username)" }}</span>
+                </div>
+            </div>
 
-{% block content %}
+            <nav class="nav flex-column px-3 flex-grow-1">
+                <a href="{% url 'dashboard'%}" class="nav-link active">
+                    <i class="fa-solid fa-grip-vertical me-2 w-25px"></i>
+                    Dashboard
+                </a>
+                <a href="{% url 'tasks'%}" class="nav-link">
+                    <i class="fa-solid fa-list-check me-2 w-25px"></i> Tasks
+                </a>
+                <a href="{% url 'analytics' %}" class="nav-link">
+                    <i class="fa-solid fa-chart-line me-2 w-25px"></i> Analytics
+                </a>
+                <a href="{% url 'settings' %}" class="nav-link">
+                    <i class="fa-solid fa-gear me-2 w-25px"></i> Settings
+                </a>
+            </nav>
+
+            <div class="px-3 mt-auto">
+                <a href="{% url 'logout' %}" class="logout-link"
+                    ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>
+                    Logout</a
+                >
+            </div>
+        </aside>
+
         <main class="content-area pt-5 pt-md-4">
-                <header class="mb-4 pb-3 border-bottom">
+            <header class="mb-4 pb-3 border-bottom">
                 <h2 class="h3 fw-bold">Dashboard</h2>
                 <p class="text-muted small m-0">{% now "l, F j, Y" %}</p>
             </header>
-            {% for task in tasks%}
-            <section class="normal-box p-3 mb-4">
+
+            <!-- High Priority Tasks Alert -->
+            {% if high_priority_tasks %}
+            {% for task in high_priority_tasks %}
+            <section class="normal-box p-3 mb-4" style="background-color: #fff5f5; border-left: 4px solid #dc3545;">
                 <div class="d-flex align-items-start gap-3 mb-3">
-                    <i class="fa-solid fa-circle-exclamation mt-1"></i>
+                    <i class="fa-solid fa-circle-exclamation mt-1" style="color: #dc3545;"></i>
                     <div>
-                        <!-- <strong class="d-block">Normal Mode</strong> -->
-                        <span class="small"
-                            >You have 1 task(s) due within {{ task.deadline}} hours</span
-                        >
+                        <span class="small">
+                            <strong>High Priority Task:</strong> {{ task.task }} is due on {{ task.deadline|date:"M d, Y" }}
+                        </span>
                     </div>
                 </div>
-                <div
-                    class="bg-white border rounded p-2 d-flex justify-content-between align-items-center">
-                    <span class="fw-bold small">{{ task.task}}</span>
-                    <span class="badge bg-warning text-dark rounded-pill"
-                        >Due 7:20 PM</span
-                    >
+                <div class="bg-white border rounded p-2 d-flex justify-content-between align-items-center">
+                    <span class="fw-bold small">{{ task.task }}</span>
+                    <a href="{% url 'update_status' task.id 'In Progress' %}" class="badge bg-danger text-white rounded-pill text-decoration-none">Start Now</a>
                 </div>
             </section>
             {% endfor %}
+            {% endif %}
 
-
+            <!-- Statistics Cards -->
             <div class="row g-4 mb-4">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-light shadow-sm p-4 h-100">
-                        <label class="text-muted small fw-bold mb-2"
-                            >Upcoming Exams</label
-                        >
-                        <div class="display-6 fw-bold">1</div>
+                        <label class="text-muted small fw-bold mb-2">
+                            <i class="fa-solid fa-list-check me-1"></i>Total Tasks
+                        </label>
+                        <div class="display-6 fw-bold text-primary">{{ total_tasks }}</div>
+                        <span class="small text-muted mt-2">All tasks created</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-light shadow-sm p-4 h-100">
-                        <label class="text-muted small fw-bold mb-2"
-                            >Pending Assignments</label
-                        >
-                        <div class="display-6 fw-bold">1</div>
-                        <span class="small text-muted mt-2">Next: Jan 19</span>
+                        <label class="text-muted small fw-bold mb-2">
+                            <i class="fa-solid fa-hourglass-end me-1"></i>Pending
+                        </label>
+                        <div class="display-6 fw-bold text-warning">{{ pending_count }}</div>
+                        <span class="small text-muted mt-2">Waiting to start</span>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="card border-light shadow-sm p-4 h-100">
-                        <label class="text-muted small fw-bold mb-2"
-                            >Total Study Time</label
-                        >
-                        <div class="display-6 fw-bold">2h</div>
-                        <span class="small text-muted mt-2"
-                            >1 tasks completed</span
-                        >
+                        <label class="text-muted small fw-bold mb-2">
+                            <i class="fa-solid fa-spinner me-1"></i>In Progress
+                        </label>
+                        <div class="display-6 fw-bold text-info">{{ in_progress_count }}</div>
+                        <span class="small text-muted mt-2">Currently active</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-light shadow-sm p-4 h-100">
+                        <label class="text-muted small fw-bold mb-2">
+                            <i class="fa-solid fa-check-circle me-1"></i>Completed
+                        </label>
+                        <div class="display-6 fw-bold text-success">{{ completed_count }}</div>
+                        <span class="small text-muted mt-2">{{ completion_percentage }}% complete</span>
                     </div>
                 </div>
             </div>
 
-            <div class="card border-light shadow-sm p-4">
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <i class="fa-solid fa-book-open fs-4 text-primary"></i>
-                    <div>
-                        <h3 class="h6 fw-bold m-0">Time by Subject</h3>
+            <!-- Progress and Time Stats -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-light shadow-sm p-4">
+                        <h3 class="h6 fw-bold mb-3">
+                            <i class="fa-solid fa-chart-pie me-2"></i>Completion Progress
+                        </h3>
+                        <div class="progress mb-2" style="height: 30px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ completion_percentage }}%" aria-valuenow="{{ completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ completion_percentage }}%
+                            </div>
+                        </div>
                         <p class="small text-muted m-0">
-                            See which subjects are taking most of your time
+                            You've completed {{ completed_count }} out of {{ total_tasks }} tasks
                         </p>
                     </div>
                 </div>
-                <div class="text-center text-muted py-4 small">
-                    No subject data available yet. Complete some tasks to see
-                    statistics.
+                <div class="col-md-6">
+                    <div class="card border-light shadow-sm p-4">
+                        <h3 class="h6 fw-bold mb-3">
+                            <i class="fa-solid fa-clock me-2"></i>Total Study Time
+                        </h3>
+                        <div class="display-6 fw-bold text-primary mb-2">{{ total_time_hours }}h</div>
+                        <p class="small text-muted m-0">
+                            Time spent on {{ completed_count }} completed task{{ completed_count|pluralize }}
+                        </p>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Priority Breakdown -->
+            <div class="card border-light shadow-sm p-4 mb-4">
+                <h3 class="h6 fw-bold mb-3">
+                    <i class="fa-solid fa-layer-group me-2"></i>Priority Breakdown (Pending)
+                </h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded">
+                            <i class="fa-solid fa-flag me-2" style="color: #dc3545;"></i>
+                            <span class="fw-bold">High Priority:</span>
+                            <span class="badge bg-danger rounded-pill">{{ high_priority_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded">
+                            <i class="fa-solid fa-flag me-2" style="color: #fd7d14;"></i>
+                            <span class="fw-bold">Medium Priority:</span>
+                            <span class="badge bg-warning rounded-pill">{{ medium_priority_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded">
+                            <i class="fa-solid fa-flag me-2" style="color: #198754;"></i>
+                            <span class="fw-bold">Low Priority:</span>
+                            <span class="badge bg-success rounded-pill">{{ low_priority_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div class="card border-light shadow-sm p-4">
+                <h3 class="h6 fw-bold mb-3">
+                    <i class="fa-solid fa-calendar-days me-2"></i>Upcoming Tasks (Next 7 Days)
+                </h3>
+                {% if upcoming_tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover small m-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Task</th>
+                                <th>Deadline</th>
+                                <th>Priority</th>
+                                <th>Duration</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in upcoming_tasks %}
+                            <tr>
+                                <td class="fw-bold">{{ task.task }}</td>
+                                <td>{{ task.deadline|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if task.priority == 'High' %}
+                                    <span class="badge bg-danger">{{ task.priority }}</span>
+                                    {% elif task.priority == 'Medium' %}
+                                    <span class="badge bg-warning text-dark">{{ task.priority }}</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ task.priority }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ task.duration }} min</td>
+                                <td>
+                                    <a href="{% url 'update_status' task.id 'In Progress' %}" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-play"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4 small">
+                    <i class="fa-solid fa-check-circle fs-1 mb-2 d-block text-success"></i>
+                    No upcoming tasks in the next 7 days. Great job staying on top of things!
+                </div>
+                {% endif %}
             </div>
         </main>
 
-{% endblock %}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
