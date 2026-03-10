@@ -10,6 +10,87 @@
                 <p class="text-muted small m-0">{% now "l, F j, Y" %}</p>
             </header>
 
+            <!-- Today's Schedule and Time Availability -->
+            <section class="mb-4">
+                <div class="row g-4">
+                    <!-- Time Availability Card -->
+                    <div class="col-md-6">
+                        <div class="card border-light shadow-sm p-4 {% if is_overbooked %}border-danger border-2{% endif %}">
+                            <h3 class="h6 fw-bold mb-3">
+                                <i class="fa-solid fa-calendar-day me-2"></i>Today's Time Availability
+                            </h3>
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="display-6 fw-bold text-primary">{{ available_hours }}h</div>
+                                        <span class="small text-muted">Available</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="display-6 fw-bold {% if is_overbooked %}text-danger{% else %}text-success{% endif %}">{{ used_hours }}h</div>
+                                        <span class="small text-muted">Scheduled</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Time Progress Bar -->
+                            <div class="progress mb-3" style="height: 25px;">
+                                <div class="progress-bar {% if is_overbooked %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ time_usage_percentage }}%" aria-valuenow="{{ used_hours }}" aria-valuemin="0" aria-valuemax="{{ available_hours }}">
+                                    {% if is_overbooked %}<small class="fw-bold text-white">OVERBOOKED</small>{% else %}<small class="fw-bold text-white">{{ used_hours }}/{{ available_hours }}h</small>{% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if is_overbooked %}
+                            <div class="alert alert-danger alert-sm py-2 mb-0">
+                                <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                                <small><strong>Overbooked by {{ overbooked_hours }}h!</strong> Some tasks will need to be rescheduled.</small>
+                            </div>
+                            {% else %}
+                            <p class="small text-muted mb-0">
+                                <i class="fa-solid fa-check-circle text-success me-1"></i>
+                                <strong>{{ remaining_hours }}h</strong> remaining time available
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Today's Tasks Card -->
+                    <div class="col-md-6">
+                        <div class="card border-light shadow-sm p-4">
+                            <h3 class="h6 fw-bold mb-3">
+                                <i class="fa-solid fa-tasks me-2"></i>Today's Tasks ({{ today_task_count }})
+                            </h3>
+                            {% if today_tasks %}
+                            <div class="task-list" style="max-height: 250px; overflow-y: auto;">
+                                {% for task in today_tasks %}
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0 small fw-bold">{{ task.task }}</p>
+                                        <small class="text-muted">
+                                            <i class="fa-solid fa-hourglass-end me-1"></i>
+                                            {% if task.duration >= 60 %}
+                                                {{ task.duration_hours }}h
+                                            {% else %}
+                                                {{ task.duration }}min
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-{% if task.priority == 'High' %}danger{% elif task.priority == 'Medium' %}warning{% else %}info{% endif %} ms-2">{{ task.priority }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info text-center py-3 mb-0">
+                                <i class="fa-solid fa-inbox me-2"></i>
+                                <small>No tasks scheduled for today</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- High Priority Tasks Alert -->
             {% if high_priority_tasks %}
             {% for task in high_priority_tasks %}
