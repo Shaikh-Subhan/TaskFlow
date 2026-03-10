@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Analytics - TaskFlow{% endblock %}
+{% block title %}Settings - TaskFlow{% endblock %}
 
 {% block content %}
 
@@ -10,77 +10,105 @@
                 <p class="text-muted small m-0">{% now "l, F j, Y" %}</p>
             </header>
 
-            <div
-                class="card border-light shadow-sm p-4"
-                style="max-width: 800px">
-                <div class="mb-4">
-                    <h3 class="h5 fw-bold mb-1">Profile Settings</h3>
-                    <p class="text-muted small m-0">
-                        Manage your personal information
-                    </p>
+            <!-- Messages -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    {% if message.level == 40 %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% elif message.level == 25 %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fa-solid fa-circle-check me-2"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row g-4">
+                <!-- Profile Settings Card -->
+                <div class="col-md-6">
+                    <div class="card border-light shadow-sm p-4">
+                        <div class="mb-4">
+                            <h3 class="h5 fw-bold mb-1">Profile Information</h3>
+                            <p class="text-muted small m-0">View your account details</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">
+                                <i class="fa-regular fa-user me-2 text-muted"></i>Username
+                            </label>
+                            <input type="text" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.username }}" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">
+                                <i class="fa-regular fa-envelope me-2 text-muted"></i>Email
+                            </label>
+                            <input type="email" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.email }}" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Role</label>
+                            <input type="text" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.first_name|default:'Not set'|capfirst }}" />
+                        </div>
+                    </div>
                 </div>
 
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small"
-                            ><i class="fa-regular fa-user me-2 text-muted"></i>
-                            Username</label
-                        >
-                        <input
-                            type="text"
-                            readonly
-                            class="form-control bg-light border-0 py-2"
-                            value="{{ request.user.username }}" />
-                    </div>
+                <!-- Time Availability Settings Card -->
+                <div class="col-md-6">
+                    <div class="card border-light shadow-sm p-4">
+                        <div class="mb-4">
+                            <h3 class="h5 fw-bold mb-1">
+                                <i class="fa-solid fa-clock me-2"></i>Daily Time Availability
+                            </h3>
+                            <p class="text-muted small m-0">Set your available working hours for intelligent task scheduling</p>
+                        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small"
-                            ><i
-                                class="fa-regular fa-envelope me-2 text-muted"></i>
-                            Email</label
-                        >
-                        <input
-                            name="email"
-                            type="email"
-                            class="form-control bg-light border-0 py-2"
-                            value="{{ request.user.email }}" />
-                    </div>
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-solid fa-hourglass-end me-2 text-muted"></i>Available Hours Per Day
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" step="0.5" min="0.5" max="24" name="available_hours" class="form-control bg-light border-0 py-2" value="{{ profile.available_hours_per_day }}" required />
+                                    <span class="input-group-text bg-light border-0">hours</span>
+                                </div>
+                                <small class="form-text text-muted">How many hours per day can you dedicate to tasks?</small>
+                            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small">Role</label>
-                        <select name="role" class="form-select bg-light border-0 py-2">
-                            <option value="" disabled {% if not request.user.first_name %}selected{% endif %}>Select your role</option>
-                            <option value="student" {% if request.user.first_name == 'student' %}selected{% endif %}>Student</option>
-                            <option value="teacher" {% if request.user.first_name == 'teacher' %}selected{% endif %}>Teacher</option>
-                            <option value="corporate" {% if request.user.first_name == 'corporate' %}selected{% endif %}>Corporate</option>
-                            <option value="entrepreneur" {% if request.user.first_name == 'entrepreneur' %}selected{% endif %}>Entrepreneur</option>
-                        </select>
-                        <p class="form-text small">Your role is currently stored in your profile.</p>
-                    </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-solid fa-sun me-2 text-muted"></i>Work Start Time
+                                </label>
+                                <input type="time" name="work_start_time" class="form-control bg-light border-0 py-2" value="{{ profile.work_start_time|time:'H:i' }}" />
+                            </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold small"
-                            ><i class="fa-regular fa-clock me-2 text-muted"></i>
-                            Peak Energy Time</label
-                        >
-                        <select class="form-select bg-light border-0 py-2">
-                            <option>Morning Person (6 AM - 12 PM)</option>
-                            <option>Afternoon Person (12 PM - 5 PM)</option>
-                            <option>Night Owl (8 PM - 2 AM)</option>
-                        </select>
-                        <p class="form-text small">
-                            This helps us recommend the best times for your
-                            tasks
-                        </p>
-                    </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-solid fa-moon me-2 text-muted"></i>Work End Time
+                                </label>
+                                <input type="time" name="work_end_time" class="form-control bg-light border-0 py-2" value="{{ profile.work_end_time|time:'H:i' }}" />
+                            </div>
 
-                    <button
-                        type="submit"
-                        class="btn bg-primary-custom fw-bold px-4">
-                        Save Changes
-                    </button>
-                </form>
+                            <button type="submit" class="btn bg-primary-custom fw-bold w-100">
+                                <i class="fa-solid fa-save me-2"></i>Save Settings & Reschedule Tasks
+                            </button>
+                        </form>
+
+                        <div class="alert alert-info mt-3 py-2 mb-0">
+                            <small>
+                                <i class="fa-solid fa-info-circle me-1"></i>
+                                Changing these settings will automatically reschedule your pending tasks based on your new availability.
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
