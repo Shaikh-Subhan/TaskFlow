@@ -61,6 +61,9 @@ def dashboard(request):
     user_tasks = Task.objects.filter(user=request.user)
     stats = get_user_task_stats(request.user)
     
+    # Get today's schedule and time availability
+    today_schedule = Task.get_today_schedule(request.user)
+    
     # Get specific task querysets
     pending_tasks = user_tasks.filter(status='Pending')
     completed_tasks = user_tasks.filter(status='Completed')
@@ -88,6 +91,11 @@ def dashboard(request):
     completion_percentage = (stats['completed_count'] / total * 100) if total > 0 else 0
     total_time_hours = (stats['total_time_minutes'] or 0) / 60
     
+    # Calculate time usage percentage
+    time_usage_percentage = 0
+    if today_schedule['available_hours'] > 0:
+        time_usage_percentage = min((today_schedule['used_hours'] / today_schedule['available_hours']) * 100, 100)
+    
     context = {
         'high_priority_tasks': high_priority_tasks,
         'upcoming_tasks': upcoming_tasks,
@@ -100,6 +108,15 @@ def dashboard(request):
         'high_priority_count': priority_breakdown['High'],
         'medium_priority_count': priority_breakdown['Medium'],
         'low_priority_count': priority_breakdown['Low'],
+        # Today's schedule data
+        'today_tasks': today_schedule['tasks'],
+        'available_hours': today_schedule['available_hours'],
+        'used_hours': today_schedule['used_hours'],
+        'remaining_hours': today_schedule['remaining_hours'],
+        'today_task_count': today_schedule['tasks_count'],
+        'is_overbooked': today_schedule['is_overbooked'],
+        'overbooked_hours': round(today_schedule['overbooked_minutes'] / 60, 2) if today_schedule['is_overbooked'] else 0,
+        'time_usage_percentage': round(time_usage_percentage, 1),
     }
     return render(request, 'dashboard.html', context)
 
@@ -168,7 +185,38 @@ def login(request):
 
 @login_required(login_url='login')
 def settings(request):
-    return render(request, 'settings.html')
+    from tasks.models import UserProfile
+    
+    # Get or create user profile
+    try:
+        profile = request.user.profile
+    except:
+        profile = UserProfile.objects.create(user=request.user)
+    
+    if request.method == 'POST':
+        # Update user profile settings
+        available_hours = float(request.POST.get('available_hours', 4.0))
+        work_start_time = request.POST.get('work_start_time', '09:00')
+        work_end_time = request.POST.get('work_end_time', '17:00')
+        
+        # Validate inputs
+        if 0 < available_hours <= 24:
+            profile.available_hours_per_day = available_hours
+            profile.work_start_time = work_start_time
+            profile.work_end_time = work_end_time
+            profile.save()
+            
+            # Reschedule all tasks after updating availability
+            from django.contrib import messages
+            Task.schedule_tasks(request.user)
+            messages.success(request, 'Settings updated and tasks rescheduled!')
+        else:
+            messages.error(request, 'Available hours must be between 0 and 24')
+    
+    context = {
+        'profile': profile,
+    }
+    return render(request, 'settings.html', context)
 
 @login_required(login_url='login')
 def logout(request):
@@ -204,10 +252,49 @@ def completed(request):
 
 @login_required(login_url='login')
 def analytics(request):
-    """Show analytics for user tasks"""
+    """Show analytics for user tasks with detailed charts"""
+    from django.db.models.functions import TruncDate
+    import json
+    
     stats = get_user_task_stats(request.user)
     total = stats['total_tasks']
     completion_percentage = (stats['completed_count'] / total * 100) if total > 0 else 0
+    
+    # Get all tasks for detailed analysis
+    all_tasks = Task.objects.filter(user=request.user)
+    
+    # Calculate daily completion data for last 7 days
+    daily_data = []
+    day_labels = []
+    today = datetime.now().date()
+    for i in range(6, -1, -1):
+        date = today - timedelta(days=i)
+        completed_today = all_tasks.filter(
+            status='Completed',
+            deadline__lte=date
+        ).count()
+        daily_data.append(completed_today)
+        day_labels.append(date.strftime('%a'))
+    
+    # Get task priority breakdown for all tasks
+    priority_breakdown = {
+        'High': all_tasks.filter(priority='High').count(),
+        'Medium': all_tasks.filter(priority='Medium').count(),
+        'Low': all_tasks.filter(priority='Low').count(),
+    }
+    
+    # Get status breakdown by percentage
+    status_breakdown = {
+        'Pending': stats['pending_count'],
+        'In Progress': stats['in_progress_count'],
+        'Completed': stats['completed_count'],
+    }
+    
+    # Calculate average completion rate
+    if stats['total_tasks'] > 0:
+        avg_completion_rate = (stats['completed_count'] / stats['total_tasks']) * 100
+    else:
+        avg_completion_rate = 0
     
     context = {
         'total_tasks': stats['total_tasks'],
@@ -215,5 +302,10 @@ def analytics(request):
         'in_progress_count': stats['in_progress_count'],
         'pending_count': stats['pending_count'],
         'completion_percentage': round(completion_percentage, 1),
+        'avg_completion_rate': round(avg_completion_rate, 1),
+        'daily_data': json.dumps(daily_data),
+        'day_labels': json.dumps(day_labels),
+        'priority_breakdown': priority_breakdown,
+        'status_breakdown': status_breakdown,
     }
     return render(request, 'analytics.html', context)
