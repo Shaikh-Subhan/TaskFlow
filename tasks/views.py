@@ -26,6 +26,10 @@ def addtask(request):
             deadline=task_deadline,
             duration=task_duration
         )
+        
+        # Schedule all pending tasks for the user after creating new task
+        Task.schedule_tasks(request.user)
+        
         return redirect('tasks') 
     return redirect('tasks')
 
