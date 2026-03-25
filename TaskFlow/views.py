@@ -208,7 +208,7 @@ def settings(request):
             
             # Reschedule all tasks after updating availability
             from django.contrib import messages
-            Task.schedule_tasks(request.user)
+            Task.schedule_tasks(request.user, force_reschedule=True)
             messages.success(request, 'Settings updated and tasks rescheduled!')
         else:
             messages.error(request, 'Available hours must be between 0 and 24')

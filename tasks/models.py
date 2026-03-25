@@ -63,7 +63,7 @@ class Task(models.Model):
         return Q(task__icontains=query) | Q(discription__icontains=query)
     
     @classmethod
-    def schedule_tasks(cls, user):
+    def schedule_tasks(cls, user, force_reschedule=False):
         """
         Intelligently schedule tasks based on available time and deadlines.
         Algorithm:
@@ -73,6 +73,7 @@ class Task(models.Model):
         4. If a task won't fit in current day, reschedule to next day
         5. Respect deadline constraints - don't schedule after deadline
         """
+        from django.db.models import Case, When, Value, IntegerField
         today = datetime.now().date()
         
         # Get or create user profile
@@ -83,20 +84,40 @@ class Task(models.Model):
         
         available_minutes_per_day = int(profile.available_hours_per_day * 60)
         
-        # Get all pending tasks sorted by deadline and priority
+        if force_reschedule:
+            # Clear scheduled_date for all Pending tasks so they are recalculated
+            cls.objects.filter(user=user, status='Pending').update(scheduled_date=None)
+
+        # 1. Pre-fill daily_schedule with time from tasks that are ALREADY scheduled for today or future
+        already_scheduled = cls.objects.filter(
+            user=user,
+            status__in=['Pending', 'In Progress'],
+            scheduled_date__isnull=False,
+            scheduled_date__gte=today
+        )
+        
+        daily_schedule = {}
+        for t in already_scheduled:
+            if t.scheduled_date not in daily_schedule:
+                daily_schedule[t.scheduled_date] = 0
+            daily_schedule[t.scheduled_date] += t.duration
+        
+        # 2. Get all pending tasks that STILL need scheduling
+        # Use Case/When to properly sort Priority: High -> Medium -> Low
         pending_tasks = cls.objects.filter(
             user=user, 
-            status='Pending'
-        ).order_by('deadline', '-priority')
-        
-        # Track time used each day
-        daily_schedule = {}
+            status='Pending',
+            scheduled_date__isnull=True
+        ).annotate(
+            priority_weight=Case(
+                When(priority='High', then=Value(1)),
+                When(priority='Medium', then=Value(2)),
+                When(priority='Low', then=Value(3)),
+                output_field=IntegerField(),
+            )
+        ).order_by('deadline', 'priority_weight')
         
         for task in pending_tasks:
-            # If task already has a deadline and scheduled date, skip
-            if task.scheduled_date:
-                continue
-            
             task_duration = task.duration  # in minutes
             deadline = task.deadline or (today + timedelta(days=365))  # 1 year default
             
@@ -115,7 +136,7 @@ class Task(models.Model):
                 if used_time + task_duration <= available_minutes_per_day:
                     # Schedule task for this day
                     task.scheduled_date = current_date
-                    task.save()
+                    task.save(update_fields=['scheduled_date'])
                     daily_schedule[current_date] += task_duration
                     scheduled = True
                 else:
@@ -125,7 +146,10 @@ class Task(models.Model):
             # If we couldn't find a day before deadline, schedule on the deadline anyway
             if not scheduled:
                 task.scheduled_date = deadline
-                task.save()
+                task.save(update_fields=['scheduled_date'])
+                if deadline not in daily_schedule:
+                    daily_schedule[deadline] = 0
+                daily_schedule[deadline] += task_duration
         
         return True
     
