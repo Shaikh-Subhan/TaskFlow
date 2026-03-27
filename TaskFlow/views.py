@@ -37,12 +37,10 @@ def tasks(request):
     """Get all user tasks with optional search filter"""
     search_query = request.GET.get('search', '').strip()
     user_tasks = Task.objects.filter(user=request.user)
-    
-    # Apply search filter if provided
+
     if search_query:
         user_tasks = user_tasks.filter(Q(task__icontains=search_query) | Q(discription__icontains=search_query))
-    
-    # Split by status in application layer (more efficient than separate queries)
+
     pending_tasks = user_tasks.filter(status='Pending').order_by('deadline')
     in_progress_tasks = user_tasks.filter(status='In Progress')
     completed_tasks = user_tasks.filter(status='Completed')
