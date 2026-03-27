@@ -38,24 +38,33 @@
                             <p class="text-muted small m-0">View your account details</p>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">
-                                <i class="fa-regular fa-user me-2 text-muted"></i>Username
-                            </label>
-                            <input type="text" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.username }}" />
-                        </div>
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="profile_info">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-regular fa-user me-2 text-muted"></i>Username
+                                </label>
+                                <input type="text" name="username" class="form-control bg-light border-0 py-2" value="{{ request.user.username }}" required />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">
-                                <i class="fa-regular fa-envelope me-2 text-muted"></i>Email
-                            </label>
-                            <input type="email" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.email }}" />
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-regular fa-envelope me-2 text-muted"></i>Email
+                                </label>
+                                <input type="email" name="email" class="form-control bg-light border-0 py-2" value="{{ request.user.email }}" required />
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Role</label>
-                            <input type="text" readonly class="form-control bg-light border-0 py-2" value="{{ request.user.first_name|default:'Not set'|capfirst }}" />
-                        </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small">Role / First Name</label>
+                                <input type="text" name="first_name" class="form-control bg-light border-0 py-2" value="{{ request.user.first_name|default:'' }}" />
+                            </div>
+                            
+                            <button type="submit" class="btn bg-primary-custom text-white fw-bold w-100">
+                                <i class="fa-solid fa-user-pen me-2"></i>Update Profile
+                            </button>
+                        </form>
                     </div>
                 </div>
 
@@ -71,6 +80,7 @@
 
                         <form method="POST" action="">
                             {% csrf_token %}
+                            <input type="hidden" name="form_type" value="availability">
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">
                                     <i class="fa-solid fa-hourglass-end me-2 text-muted"></i>Available Hours Per Day

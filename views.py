@@ -37,12 +37,10 @@ def tasks(request):
     """Get all user tasks with optional search filter"""
     search_query = request.GET.get('search', '').strip()
     user_tasks = Task.objects.filter(user=request.user)
-    
-    # Apply search filter if provided
+
     if search_query:
-        user_tasks = user_tasks.filter(Q(task__icontains=search_query) | Q(description__icontains=search_query))
-    
-    # Split by status in application layer (more efficient than separate queries)
+        user_tasks = user_tasks.filter(Q(task__icontains=search_query) | Q(discription__icontains=search_query))
+
     pending_tasks = user_tasks.filter(status='Pending').order_by('deadline')
     in_progress_tasks = user_tasks.filter(status='In Progress')
     completed_tasks = user_tasks.filter(status='Completed')
@@ -194,38 +192,24 @@ def settings(request):
         profile = UserProfile.objects.create(user=request.user)
     
     if request.method == 'POST':
-        form_type = request.POST.get('form_type')
-        from django.contrib import messages
+        # Update user profile settings
+        available_hours = float(request.POST.get('available_hours', 4.0))
+        work_start_time = request.POST.get('work_start_time', '09:00')
+        work_end_time = request.POST.get('work_end_time', '17:00')
         
-        if form_type == 'profile_info':
-            # Update core user information
-            request.user.username = request.POST.get('username')
-            request.user.email = request.POST.get('email')
-            request.user.first_name = request.POST.get('first_name')
-            try:
-                request.user.save()
-                messages.success(request, 'Profile updated successfully!')
-            except Exception as e:
-                messages.error(request, 'Error updating profile. Username or email might be taken.')
-                
-        else:
-            # Update user profile settings (availability)
-            available_hours = float(request.POST.get('available_hours', 4.0))
-            work_start_time = request.POST.get('work_start_time', '09:00')
-            work_end_time = request.POST.get('work_end_time', '17:00')
+        # Validate inputs
+        if 0 < available_hours <= 24:
+            profile.available_hours_per_day = available_hours
+            profile.work_start_time = work_start_time
+            profile.work_end_time = work_end_time
+            profile.save()
             
-            # Validate inputs
-            if 0 < available_hours <= 24:
-                profile.available_hours_per_day = available_hours
-                profile.work_start_time = work_start_time
-                profile.work_end_time = work_end_time
-                profile.save()
-                
-                # Reschedule all tasks after updating availability
-                Task.schedule_tasks(request.user, force_reschedule=True)
-                messages.success(request, 'Availability settings updated and tasks rescheduled!')
-            else:
-                messages.error(request, 'Available hours must be between 0 and 24')
+            # Reschedule all tasks after updating availability
+            from django.contrib import messages
+            Task.schedule_tasks(request.user, force_reschedule=True)
+            messages.success(request, 'Settings updated and tasks rescheduled!')
+        else:
+            messages.error(request, 'Available hours must be between 0 and 24')
     
     context = {
         'profile': profile,

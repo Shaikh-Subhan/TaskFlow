@@ -69,7 +69,7 @@
                                     {% for task in tasks %}
                                     <tr>
                                         <td class="fw-bold"><i class="fa-solid fa-check-circle text-success me-2"></i>{{ task.task }}</td>
-                                        <td>{{ task.discription|truncatewords:10 }}</td>
+                                        <td>{{ task.description|truncatewords:10 }}</td>
                                         <td>
                                             <span class="badge bg-{% if task.priority == 'High' %}danger{% elif task.priority == 'Medium' %}warning{% else %}info{% endif %}">
                                                 {{ task.priority }}

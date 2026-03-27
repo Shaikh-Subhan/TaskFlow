@@ -158,7 +158,7 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex gap-4 text-muted small mb-3">
+                            <div class="d-flex gap-4 text-muted small mb-2">
                                 <span
                                     ><i class="fa-regular fa-clock me-1"></i>
                                     {{task.duration|default:"30" }} min</span
@@ -168,6 +168,12 @@
                                     {{ task.deadline|date:"M d, Y" }}</span
                                 >
                             </div>
+                            
+                            {% if task.description %}
+                            <p class="small text-muted mb-3">{{ task.description|truncatewords:20 }}</p>
+                            {% else %}
+                            <p class="small text-muted mb-3 fst-italic">No description provided.</p>
+                            {% endif %}
 
                             <div class="d-flex gap-2">
                                 {% if task.priority == 'High' %}
@@ -236,6 +242,11 @@
                                                 class="form-control bg-light border-0"
                                                 value="{{ task.task }}"
                                                 required />
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold small">Description</label>
+                                            <textarea name="description" class="form-control bg-light border-0" rows="2">{{ task.description|default_if_none:"" }}</textarea>
                                         </div>
 
                                         <div class="row mb-3">
@@ -334,7 +345,7 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="d-flex gap-4 text-muted small mb-3">
+                            <div class="d-flex gap-4 text-muted small mb-2">
                                 <span class="fw-bold">
                                     <i class="fa-regular fa-clock me-1"></i>
                                     <span
@@ -346,6 +357,13 @@
                                     </span>
                                 </span>
                             </div>
+                            
+                            {% if task.description %}
+                            <p class="small text-muted mb-3">{{ task.description|truncatewords:20 }}</p>
+                            {% else %}
+                            <p class="small text-muted mb-3 fst-italic">No description provided.</p>
+                            {% endif %}
+                            
                             <div class="d-flex gap-2">
                                 <span
                                     class="tag"
@@ -392,6 +410,11 @@
                                     </a>
                                 </div>
                             </div>
+                            
+                            {% if task.description %}
+                            <p class="small text-muted mb-3">{{ task.description|truncatewords:20 }}</p>
+                            {% endif %}
+                            
                             <div class="d-flex gap-2">
                                 <span class="tag bg-success text-white"
                                     >{{ task.status }}</span
@@ -442,6 +465,7 @@
                                     >Description</label
                                 >
                                 <textarea
+                                    name="description"
                                     class="form-control bg-light border-0"
                                     rows="3"></textarea>
                             </div>

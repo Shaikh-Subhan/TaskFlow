@@ -33,7 +33,7 @@ class Task(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
     task = models.CharField(max_length=100, db_index=True)
-    discription = models.CharField(max_length=250, blank=True)
+    description = models.CharField(max_length=250, blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     duration = models.IntegerField(default=30)  # Duration in minutes
     deadline = models.DateField(null=True, blank=True, db_index=True)
@@ -60,7 +60,7 @@ class Task(models.Model):
     
     def search(self, query):
         """Search task by name or description"""
-        return Q(task__icontains=query) | Q(discription__icontains=query)
+        return Q(task__icontains=query) | Q(description__icontains=query)
     
     @classmethod
     def schedule_tasks(cls, user, force_reschedule=False):

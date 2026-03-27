@@ -14,6 +14,7 @@ def addtask(request):
     """Create a new task for the current user"""
     if request.method == "POST":
         task_name = request.POST.get('task')
+        task_description = request.POST.get('description', '')
         task_priority = request.POST.get('priority')
         task_deadline = request.POST.get('deadline') or None
         task_duration = int(request.POST.get('duration') or 30)
@@ -22,6 +23,7 @@ def addtask(request):
         Task.objects.create(
             user=request.user,
             task=task_name,
+            description=task_description,
             priority=task_priority,
             deadline=task_deadline,
             duration=task_duration
@@ -71,6 +73,7 @@ def edit_task(request, task_id):
         
         # Update fields
         task.task = request.POST.get('task')
+        task.description = request.POST.get('description', task.description)
         task.priority = request.POST.get('priority')
         task.duration = int(request.POST.get('duration') or task.duration)
         new_deadline = request.POST.get('deadline')
@@ -79,7 +82,7 @@ def edit_task(request, task_id):
             task.deadline = new_deadline
         
         # Optimized save - only update changed fields
-        task.save(update_fields=['task', 'priority', 'duration', 'deadline', 'updated_at'])
+        task.save(update_fields=['task', 'description', 'priority', 'duration', 'deadline', 'updated_at'])
         return redirect('tasks')
         
     return redirect('tasks')
