@@ -22,14 +22,15 @@ def get_user_task_stats(user):
         pending=Count('id', filter=Q(status='Pending')),
         in_progress=Count('id', filter=Q(status='In Progress')),
         completed=Count('id', filter=Q(status='Completed')),
-        total_duration=Sum('duration', filter=Q(status='Completed')) or 0,
+        total_time_seconds=Sum('accumulated_time_seconds', filter=Q(status='Completed'))
     )
+    total_sec = stats['total_time_seconds'] or 0
     return {
         'total_tasks': stats['total'],
         'pending_count': stats['pending'],
         'in_progress_count': stats['in_progress'],
         'completed_count': stats['completed'],
-        'total_time_minutes': stats['total_duration'],
+        'total_time_minutes': round(total_sec / 60, 1),
     }
 
 @login_required(login_url='login')
@@ -112,6 +113,8 @@ def dashboard(request):
         'today_tasks': today_schedule['tasks'],
         'available_hours': today_schedule['available_hours'],
         'used_hours': today_schedule['used_hours'],
+        'pending_hours': today_schedule['pending_hours'],
+        'completed_hours': today_schedule['completed_hours'],
         'remaining_hours': today_schedule['remaining_hours'],
         'today_task_count': today_schedule['tasks_count'],
         'is_overbooked': today_schedule['is_overbooked'],

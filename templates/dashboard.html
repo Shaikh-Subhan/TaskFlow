@@ -20,24 +20,33 @@
                                 <i class="fa-solid fa-calendar-day me-2"></i>Today's Time Availability
                             </h3>
                             <div class="row g-3 mb-3">
-                                <div class="col-6">
+                                <div class="col-4">
                                     <div class="text-center">
-                                        <div class="display-6 fw-bold text-primary">{{ available_hours }}h</div>
-                                        <span class="small text-muted">Available</span>
+                                        <div class="display-6 fw-bold text-success">{{ completed_hours }}h</div>
+                                        <span class="small text-muted">Completed</span>
                                     </div>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-4">
                                     <div class="text-center">
-                                        <div class="display-6 fw-bold {% if is_overbooked %}text-danger{% else %}text-success{% endif %}">{{ used_hours }}h</div>
-                                        <span class="small text-muted">Scheduled</span>
+                                        <div class="display-6 fw-bold {% if is_overbooked %}text-danger{% else %}text-primary{% endif %}">{{ pending_hours }}h</div>
+                                        <span class="small text-muted">Pending</span>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="text-center">
+                                        <div class="display-6 fw-bold text-muted">{{ available_hours }}h</div>
+                                        <span class="small text-muted">Total Limit</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Time Progress Bar -->
                             <div class="progress mb-3" style="height: 25px;">
-                                <div class="progress-bar {% if is_overbooked %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ time_usage_percentage }}%" aria-valuenow="{{ used_hours }}" aria-valuemin="0" aria-valuemax="{{ available_hours }}">
-                                    {% if is_overbooked %}<small class="fw-bold text-white">OVERBOOKED</small>{% else %}<small class="fw-bold text-white">{{ used_hours }}/{{ available_hours }}h</small>{% endif %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio completed_hours available_hours 100 %}%">
+                                    {% if completed_hours > 0 %}<small class="fw-bold text-white">Done</small>{% endif %}
+                                </div>
+                                <div class="progress-bar {% if is_overbooked %}bg-danger{% else %}bg-primary{% endif %}" role="progressbar" style="width: {% widthratio pending_hours available_hours 100 %}%">
+                                    {% if pending_hours > 0 %}<small class="fw-bold text-white">Pending</small>{% endif %}
                                 </div>
                             </div>
                             

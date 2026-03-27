@@ -181,19 +181,32 @@ class Task(models.Model):
             status__in=['Pending', 'In Progress']
         ).order_by('-priority')
         
+        completed_today_tasks = cls.objects.filter(
+            user=user,
+            scheduled_date=today,
+            status='Completed'
+        )
+        
         # Calculate time metrics
-        total_duration = sum(task.duration for task in today_tasks)
+        pending_duration = sum(task.duration for task in today_tasks)
+        completed_duration = sum(task.duration for task in completed_today_tasks)
+        
+        total_assigned_minutes = pending_duration + completed_duration
+        
         tasks_count = today_tasks.count()
         available_hours = profile.available_hours_per_day
-        used_time = total_duration
-        remaining_minutes = available_minutes - total_duration
+        remaining_minutes = available_minutes - total_assigned_minutes
         
         return {
             'tasks': today_tasks,
             'available_minutes': available_minutes,
             'available_hours': available_hours,
-            'used_minutes': used_time,
-            'used_hours': round(used_time / 60, 2),
+            'pending_minutes': pending_duration,
+            'pending_hours': round(pending_duration / 60, 2),
+            'completed_minutes': completed_duration,
+            'completed_hours': round(completed_duration / 60, 2),
+            'used_minutes': total_assigned_minutes,
+            'used_hours': round(total_assigned_minutes / 60, 2),
             'remaining_minutes': remaining_minutes,
             'remaining_hours': round(remaining_minutes / 60, 2),
             'tasks_count': tasks_count,
