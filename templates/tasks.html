@@ -288,6 +288,11 @@
                                                 value="{{ task.duration }}"
                                                  />
                                         </div>
+                                        
+                                        <div class="form-check form-switch mb-4">
+                                            <input name="is_hard_deadline" class="form-check-input" type="checkbox" role="switch" {% if task.is_hard_deadline %}checked{% endif %} />
+                                            <label class="form-check-label fw-bold small ms-2">Hard Deadline (Cannot be moved)</label>
+                                        </div>
 
                                         <div
                                             class="d-flex justify-content-end gap-2">
@@ -336,6 +341,15 @@
                                         title="Stop & Undo">
                                         <i class="fa-solid fa-stop"></i>
                                     </a>
+                                    {% if task.is_paused %}
+                                    <a href="{% url 'toggle_pause' task.id %}" class="btn btn-warning btn-sm text-dark" title="Resume Task">
+                                        <i class="fa-solid fa-play"></i>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'toggle_pause' task.id %}" class="btn btn-warning btn-sm text-dark" title="Pause Task">
+                                        <i class="fa-solid fa-pause"></i>
+                                    </a>
+                                    {% endif %}
                                     <a
                                         href="{% url 'update_status' task.id 'Completed' %}"
                                         class="btn btn-light btn-sm"
@@ -349,11 +363,11 @@
                                 <span class="fw-bold">
                                     <i class="fa-regular fa-clock me-1"></i>
                                     <span
-                                        class="countdown-timer"
-                                        data-start="{{ task.started_at|date:'c' }}"
-                                        data-duration="{{ task.duration }}"
-                                        data-complete-url="{% url 'update_status' task.id 'Completed' %}">
-                                        Calculating...
+                                        class="stopwatch-timer"
+                                        data-start="{{ task.started_at|date:'c'|default:'' }}"
+                                        data-accumulated="{{ task.accumulated_time_seconds }}"
+                                        data-is-paused="{{ task.is_paused|yesno:'true,false' }}">
+                                        00:00
                                     </span>
                                 </span>
                             </div>
@@ -365,14 +379,13 @@
                             {% endif %}
                             
                             <div class="d-flex gap-2">
-                                <span
-                                    class="tag"
-                                    style="
-                                        background-color: #fff3cd;
-                                        color: #856404;
-                                    "
-                                    >{{ task.status }}</span
-                                >
+                                {% if task.is_paused %}
+                                <span class="tag bg-warning text-dark">Paused</span>
+                                {% else %}
+                                <span class="tag" style="background-color: #fff3cd; color: #856404;">
+                                    {{ task.status }}
+                                </span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -515,15 +528,16 @@
                                     required />
                             </div>
                             <div class="form-check form-switch mb-4">
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    role="switch" />
-                                <label
-                                    class="form-check-label fw-bold small ms-2"
-                                    >Hard Deadline (Cannot be moved)</label
-                                >
-                            </div>
+                                            <input
+                                                name="is_hard_deadline"
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                role="switch" />
+                                            <label
+                                                class="form-check-label fw-bold small ms-2"
+                                                >Hard Deadline (Cannot be moved)</label
+                                            >
+                                        </div>
                             <div class="d-flex justify-content-end gap-2">
                                 <button
                                     type="button"
@@ -594,64 +608,41 @@
                         }
                     });
                 });
-                /* --- 3. Live Countdown Timer Engine --- */
-                const timers = document.querySelectorAll(".countdown-timer");
+                /* --- 3. Live Count-Up Stopwatch Engine --- */
+                const stopwatches = document.querySelectorAll(".stopwatch-timer");
 
-                if (timers.length > 0) {
+                if (stopwatches.length > 0) {
                     setInterval(function () {
                         const now = new Date().getTime();
 
-                        timers.forEach((timer) => {
-                            // Get the start time and duration from the HTML attributes
-                            const startTimeStr =
-                                timer.getAttribute("data-start");
-                            const durationMins = parseInt(
-                                timer.getAttribute("data-duration"),
-                            );
-                            const completeUrl =
-                                timer.getAttribute("data-complete-url");
+                        stopwatches.forEach((timer) => {
+                            const startTimeStr = timer.getAttribute("data-start");
+                            const isPaused = timer.getAttribute("data-is-paused") === 'true';
+                            let accumulatedSecs = parseInt(timer.getAttribute("data-accumulated")) || 0;
 
-                            if (startTimeStr) {
-                                const startTime = new Date(
-                                    startTimeStr,
-                                ).getTime();
-                                // Calculate exact end time (start time + duration in milliseconds)
-                                const endTime =
-                                    startTime + durationMins * 60 * 1000;
+                            let totalSeconds = accumulatedSecs;
 
-                                // Find the difference
-                                const distance = endTime - now;
+                            if (startTimeStr && !isPaused) {
+                                const startTime = new Date(startTimeStr).getTime();
+                                totalSeconds += Math.floor((now - startTime) / 1000);
+                            }
 
-                                if (distance <= 0) {
-                                    // Time is up! Automatically complete the task.
-                                    timer.innerHTML = "00:00 - Completing...";
-                                    window.location.href = completeUrl;
-                                } else {
-                                    // Calculate minutes and seconds
-                                    const minutes = Math.floor(
-                                        (distance % (1000 * 60 * 60)) /
-                                            (1000 * 60),
-                                    );
-                                    const seconds = Math.floor(
-                                        (distance % (1000 * 60)) / 1000,
-                                    );
+                            const minutes = Math.floor(totalSeconds / 60);
+                            const seconds = totalSeconds % 60;
+                            const hours = Math.floor(minutes / 60);
+                            const minsLeft = minutes % 60;
 
-                                    const formattedMins =
-                                        minutes < 10 ? "0" + minutes : minutes;
-                                    const formattedSecs =
-                                        seconds < 10 ? "0" + seconds : seconds;
+                            const formattedMins = minsLeft < 10 ? "0" + minsLeft : minsLeft;
+                            const formattedSecs = seconds < 10 ? "0" + seconds : seconds;
 
-                                    timer.innerHTML =
-                                        formattedMins + ":" + formattedSecs;
-                                    if (minutes === 0) {
-                                        timer.parentElement.classList.remove(
-                                            "text-primary",
-                                        );
-                                        timer.parentElement.classList.add(
-                                            "text-danger",
-                                        );
-                                    }
-                                }
+                            if (hours > 0) {
+                                timer.innerHTML = hours + ":" + formattedMins + ":" + formattedSecs;
+                            } else {
+                                timer.innerHTML = formattedMins + ":" + formattedSecs;
+                            }
+                            
+                            if (isPaused) {
+                                timer.innerHTML += " (Paused)";
                             }
                         });
                     }, 1000);

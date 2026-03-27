@@ -18,6 +18,7 @@ def addtask(request):
         task_priority = request.POST.get('priority')
         task_deadline = request.POST.get('deadline') or None
         task_duration = int(request.POST.get('duration') or 30)
+        is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
         
         # Create task efficiently
         Task.objects.create(
@@ -26,7 +27,8 @@ def addtask(request):
             description=task_description,
             priority=task_priority,
             deadline=task_deadline,
-            duration=task_duration
+            duration=task_duration,
+            is_hard_deadline=is_hard_deadline
         )
         
         # Schedule all pending tasks for the user after creating new task
@@ -46,9 +48,19 @@ def update_status(request, task_id, new_status):
     
     # Use transaction for atomic update
     with transaction.atomic():
+        if new_status == 'In Progress':
+            if task.status != 'In Progress':
+                task.started_at = timezone.now()
+                task.is_paused = False
+        elif new_status == 'Completed':
+            if task.started_at and not task.is_paused:
+                delta = timezone.now() - task.started_at
+                task.accumulated_time_seconds += int(delta.total_seconds())
+                task.started_at = None
+            task.is_paused = False
+            
         task.status = new_status
-        task.started_at = timezone.now() if new_status == 'In Progress' else None
-        task.save(update_fields=['status', 'started_at', 'updated_at'])
+        task.save(update_fields=['status', 'started_at', 'accumulated_time_seconds', 'is_paused', 'updated_at'])
     
     # Redirect to appropriate tab
     tab_map = {
@@ -66,6 +78,31 @@ def delete_task(request, task_id):
     return redirect('tasks')
 
 @login_required(login_url='login')
+def toggle_pause(request, task_id):
+    """Pause or resume an in-progress task."""
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    
+    if task.status != 'In Progress':
+        return redirect(reverse('tasks') + '#progress-tab')
+        
+    with transaction.atomic():
+        if task.is_paused:
+            # Resuming
+            task.started_at = timezone.now()
+            task.is_paused = False
+        else:
+            # Pausing
+            if task.started_at:
+                delta = timezone.now() - task.started_at
+                task.accumulated_time_seconds += int(delta.total_seconds())
+            task.started_at = None
+            task.is_paused = True
+            
+        task.save(update_fields=['started_at', 'accumulated_time_seconds', 'is_paused', 'updated_at'])
+        
+    return redirect(reverse('tasks') + '#progress-tab')
+
+@login_required(login_url='login')
 def edit_task(request, task_id):
     """Edit task details"""
     if request.method == "POST":
@@ -80,9 +117,11 @@ def edit_task(request, task_id):
         
         if new_deadline:
             task.deadline = new_deadline
+            
+        task.is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
         
         # Optimized save - only update changed fields
-        task.save(update_fields=['task', 'description', 'priority', 'duration', 'deadline', 'updated_at'])
+        task.save(update_fields=['task', 'description', 'priority', 'duration', 'deadline', 'is_hard_deadline', 'updated_at'])
         return redirect('tasks')
         
     return redirect('tasks')

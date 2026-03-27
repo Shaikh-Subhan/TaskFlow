@@ -187,31 +187,33 @@
             <!-- Priority Breakdown -->
             <div class="card border-light shadow-sm p-4 mb-4">
                 <h3 class="h6 fw-bold mb-3">
-                    <i class="fa-solid fa-layer-group me-2"></i>Priority Breakdown (Pending)
+                    <i class="fa-solid fa-layer-group me-2"></i>Priority Breakdown (Active Tasks)
                 </h3>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 rounded">
-                            <i class="fa-solid fa-flag me-2" style="color: #dc3545;"></i>
-                            <span class="fw-bold">High Priority:</span>
-                            <span class="badge bg-danger rounded-pill">{{ high_priority_count }}</span>
-                        </div>
+                
+                {% with total_active=high_priority_count|add:medium_priority_count|add:low_priority_count %}
+                {% if total_active > 0 %}
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: {% widthratio high_priority_count total_active 100 %}%">
+                        {% if high_priority_count > 0 %}{{ high_priority_count }} High{% endif %}
                     </div>
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 rounded">
-                            <i class="fa-solid fa-flag me-2" style="color: #fd7d14;"></i>
-                            <span class="fw-bold">Medium Priority:</span>
-                            <span class="badge bg-warning rounded-pill">{{ medium_priority_count }}</span>
-                        </div>
+                    <div class="progress-bar bg-warning text-dark" role="progressbar" style="width: {% widthratio medium_priority_count total_active 100 %}%">
+                        {% if medium_priority_count > 0 %}{{ medium_priority_count }} Med{% endif %}
                     </div>
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 rounded">
-                            <i class="fa-solid fa-flag me-2" style="color: #198754;"></i>
-                            <span class="fw-bold">Low Priority:</span>
-                            <span class="badge bg-success rounded-pill">{{ low_priority_count }}</span>
-                        </div>
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio low_priority_count total_active 100 %}%">
+                        {% if low_priority_count > 0 %}{{ low_priority_count }} Low{% endif %}
                     </div>
                 </div>
+                <p class="small text-muted mb-0 text-center">
+                    <span class="badge bg-danger rounded-pill me-1">{{ high_priority_count }}</span> High &nbsp;|&nbsp;
+                    <span class="badge bg-warning text-dark rounded-pill me-1">{{ medium_priority_count }}</span> Medium &nbsp;|&nbsp;
+                    <span class="badge bg-success rounded-pill me-1">{{ low_priority_count }}</span> Low
+                </p>
+                {% else %}
+                <div class="alert alert-light text-center py-3 border mb-0">
+                    <small class="text-muted"><i class="fa-solid fa-check-circle me-1"></i> No active tasks. You're all caught up!</small>
+                </div>
+                {% endif %}
+                {% endwith %}
             </div>
 
             <!-- Upcoming Tasks -->

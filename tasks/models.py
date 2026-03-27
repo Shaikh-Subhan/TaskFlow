@@ -42,6 +42,9 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     started_at = models.DateTimeField(null=True, blank=True)
+    accumulated_time_seconds = models.IntegerField(default=0)
+    is_paused = models.BooleanField(default=False)
+    is_hard_deadline = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-created_at']
@@ -123,10 +126,14 @@ class Task(models.Model):
             
             # Start searching from today
             current_date = today
-            scheduled = False
-            
-            # Try to find a day with available time before deadline
-            while current_date <= deadline and not scheduled:
+            # Try to find a day with available time
+            while True:
+                # If we breached the deadline and it's a hard deadline, FORCE it onto the deadline
+                if current_date > deadline and task.is_hard_deadline:
+                    task.scheduled_date = deadline
+                    scheduled = True
+                    break
+                    
                 # Initialize daily time if not exists
                 if current_date not in daily_schedule:
                     daily_schedule[current_date] = 0
@@ -136,20 +143,22 @@ class Task(models.Model):
                 if used_time + task_duration <= available_minutes_per_day:
                     # Schedule task for this day
                     task.scheduled_date = current_date
-                    task.save(update_fields=['scheduled_date'])
-                    daily_schedule[current_date] += task_duration
                     scheduled = True
+                    break
                 else:
-                    # Move to next day
+                    # If it doesn't fit, but today IS the deadline and it's a hard deadline, FORCE it
+                    if current_date == deadline and task.is_hard_deadline:
+                        task.scheduled_date = deadline
+                        scheduled = True
+                        break
+                    
+                    # Otherwise, move to next day (flexible tasks push past deadline if needed)
                     current_date += timedelta(days=1)
             
-            # If we couldn't find a day before deadline, schedule on the deadline anyway
-            if not scheduled:
-                task.scheduled_date = deadline
-                task.save(update_fields=['scheduled_date'])
-                if deadline not in daily_schedule:
-                    daily_schedule[deadline] = 0
-                daily_schedule[deadline] += task_duration
+            task.save(update_fields=['scheduled_date'])
+            if task.scheduled_date not in daily_schedule:
+                daily_schedule[task.scheduled_date] = 0
+            daily_schedule[task.scheduled_date] += task_duration
         
         return True
     

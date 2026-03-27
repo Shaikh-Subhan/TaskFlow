@@ -77,8 +77,9 @@ def dashboard(request):
         deadline__lte=today + timedelta(days=7)
     ).order_by('deadline')
     
-    # Get priority breakdown for pending tasks
-    priority_stats = pending_tasks.values('priority').annotate(count=Count('id'))
+    # Get priority breakdown for all active tasks
+    active_tasks = user_tasks.filter(status__in=['Pending', 'In Progress'])
+    priority_stats = active_tasks.values('priority').annotate(count=Count('id'))
     priority_breakdown = {
         'High': next((p['count'] for p in priority_stats if p['priority'] == 'High'), 0),
         'Medium': next((p['count'] for p in priority_stats if p['priority'] == 'Medium'), 0),
@@ -198,8 +199,14 @@ def settings(request):
         
         if form_type == 'profile_info':
             # Update core user information
+            new_email = request.POST.get('email')
+            import re
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
+                messages.error(request, 'Please enter a valid, perfectly formatted email address.')
+                return redirect('settings')
+                
             request.user.username = request.POST.get('username')
-            request.user.email = request.POST.get('email')
+            request.user.email = new_email
             request.user.first_name = request.POST.get('first_name')
             try:
                 request.user.save()
