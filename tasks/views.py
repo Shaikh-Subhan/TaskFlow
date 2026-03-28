@@ -3,24 +3,46 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import transaction
-
 from .models import Task
+from django.utils.dateparse import parse_datetime, parse_date
+from datetime import datetime, time
+
 
 # Define valid status constants
 VALID_STATUSES = ('Pending', 'In Progress', 'Completed')
 
 @login_required(login_url='login')
 def addtask(request):
-    """Create a new task for the current user"""
     if request.method == "POST":
         task_name = request.POST.get('task')
         task_description = request.POST.get('description', '')
         task_priority = request.POST.get('priority')
-        task_deadline = request.POST.get('deadline') or None
         task_duration = int(request.POST.get('duration') or 30)
+        
         is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
         
-        # Create task efficiently
+        # --- DEADLINE LOGIC ---
+        task_deadline_str = request.POST.get('deadline')
+        task_deadline = None
+        
+        if task_deadline_str:
+            parsed_dt = parse_datetime(task_deadline_str)
+            if not parsed_dt:
+                parsed_d = parse_date(task_deadline_str)
+                if parsed_d:
+                    parsed_dt = datetime.combine(parsed_d, time(23, 59))
+            
+            if parsed_dt:
+                if timezone.is_naive(parsed_dt):
+                    parsed_dt = timezone.make_aware(parsed_dt)
+                
+                # Throw an error if the date is in the past!
+                if parsed_dt < timezone.now():
+                    return redirect('tasks')
+                
+                task_deadline = parsed_dt
+        # ----------------------
+
         Task.objects.create(
             user=request.user,
             task=task_name,
@@ -28,13 +50,59 @@ def addtask(request):
             priority=task_priority,
             deadline=task_deadline,
             duration=task_duration,
-            is_hard_deadline=is_hard_deadline
+            is_hard_deadline=is_hard_deadline,
         )
         
-        # Schedule all pending tasks for the user after creating new task
         Task.schedule_tasks(request.user)
         
         return redirect('tasks') 
+    return redirect('tasks')
+@login_required(login_url='login')
+def edit_task(request, task_id):
+    if request.method == "POST":
+        task = get_object_or_404(Task, id=task_id, user=request.user)
+        
+        task.task = request.POST.get('task')
+        task.description = request.POST.get('description', task.description)
+        task.category = request.POST.get('category', task.category)
+        task.priority = request.POST.get('priority')
+        task.duration = int(request.POST.get('duration') or task.duration)
+        
+        task.is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
+        task.is_recurring = request.POST.get('is_recurring') == 'on'
+        task.is_batch_task = request.POST.get('is_batch_task') == 'on'
+        task.is_deep_work = request.POST.get('is_deep_work') == 'on'
+        
+        # --- DEADLINE LOGIC ---
+        new_deadline_str = request.POST.get('deadline')
+        if new_deadline_str:
+            parsed_dt = parse_datetime(new_deadline_str)
+            if not parsed_dt:
+                parsed_d = parse_date(new_deadline_str)
+                if parsed_d:
+                    parsed_dt = datetime.combine(parsed_d, time(23, 59))
+            
+            if parsed_dt:
+                if timezone.is_naive(parsed_dt):
+                    parsed_dt = timezone.make_aware(parsed_dt)
+                
+                # Throw an error if the date is in the past!
+                if parsed_dt < timezone.now():
+                    return redirect('tasks')
+                
+                task.deadline = parsed_dt
+        # ----------------------
+        
+        task.save(update_fields=[
+            'task', 'description', 'category', 'priority', 'duration', 
+            'deadline', 'is_hard_deadline', 'is_recurring', 'is_batch_task', 
+            'is_deep_work', 'updated_at'
+        ])
+        
+        Task.schedule_tasks(request.user)
+        
+        return redirect('tasks')
+        
     return redirect('tasks')
 
 @login_required(login_url='login')
@@ -102,26 +170,3 @@ def toggle_pause(request, task_id):
         
     return redirect(reverse('tasks') + '#progress-tab')
 
-@login_required(login_url='login')
-def edit_task(request, task_id):
-    """Edit task details"""
-    if request.method == "POST":
-        task = get_object_or_404(Task, id=task_id, user=request.user)
-        
-        # Update fields
-        task.task = request.POST.get('task')
-        task.description = request.POST.get('description', task.description)
-        task.priority = request.POST.get('priority')
-        task.duration = int(request.POST.get('duration') or task.duration)
-        new_deadline = request.POST.get('deadline')
-        
-        if new_deadline:
-            task.deadline = new_deadline
-            
-        task.is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
-        
-        # Optimized save - only update changed fields
-        task.save(update_fields=['task', 'description', 'priority', 'duration', 'deadline', 'is_hard_deadline', 'updated_at'])
-        return redirect('tasks')
-        
-    return redirect('tasks')

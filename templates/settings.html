@@ -10,7 +10,6 @@
                 <p class="text-muted small m-0">{% now "l, F j, Y" %}</p>
             </header>
 
-            <!-- Messages -->
             {% if messages %}
             <div class="mb-4">
                 {% for message in messages %}
@@ -30,17 +29,21 @@
             {% endif %}
 
             <div class="row g-4">
-                <!-- Profile Settings Card -->
                 <div class="col-md-6">
-                    <div class="card border-light shadow-sm p-4">
+                    <div class="card border-light shadow-sm p-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div>
                                 <h3 class="h5 fw-bold mb-1">Profile Information</h3>
-                                <p class="text-muted small m-0">View your account details</p>
+                                <p class="text-muted small m-0">Manage your personal details</p>
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="editProfileBtn">
-                                <i class="fa-solid fa-pencil me-1"></i> Edit Profile
-                            </button>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="editProfileBtn">
+                                    <i class="fa-solid fa-pencil me-1"></i> Edit
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                                    <i class="fa-solid fa-key me-1"></i> Password
+                                </button>
+                            </div>
                         </div>
                         
                         <form method="POST" action="">
@@ -62,9 +65,15 @@
                             </div>
 
                             <div class="mb-4">
-                                <input type="text" name="first_name" class="form-control bg-light border-0 py-2 text-muted" value="{{ request.user.first_name|default:'' }}" readonly />
+                                <label class="form-label fw-bold small">
+                                    <i class="fa-solid fa-graduation-cap me-2 text-muted"></i>Role
+                                </label>
+                                <select id="roleField" name="role" class="form-select bg-light border-0 py-2" disabled required>
+                                    <option value="Student" {% if request.user.profile.role == 'Student' %}selected{% endif %}>Student</option>
+                                    <option value="Teacher" {% if request.user.profile.role == 'Teacher' %}selected{% endif %}>Teacher</option>
+                                    <option value="Employee" {% if request.user.profile.role == 'Employee' %}selected{% endif %}>Employee</option>
+                                </select>
                             </div>
-                            
                             
                             <button type="submit" id="saveProfileBtn" class="btn bg-primary-custom text-white fw-bold w-100 d-none">
                                 <i class="fa-solid fa-save me-2"></i>Save Profile Changes
@@ -73,14 +82,13 @@
                     </div>
                 </div>
 
-                <!-- Time Availability Settings Card -->
                 <div class="col-md-6">
-                    <div class="card border-light shadow-sm p-4">
+                    <div class="card border-light shadow-sm p-4 h-100">
                         <div class="mb-4">
                             <h3 class="h5 fw-bold mb-1">
                                 <i class="fa-solid fa-clock me-2"></i>Daily Time Availability
                             </h3>
-                            <p class="text-muted small m-0">Set your available working hours for intelligent task scheduling</p>
+                            <p class="text-muted small m-0">Set your available working hours</p>
                         </div>
 
                         <form method="POST" action="">
@@ -94,7 +102,6 @@
                                     <input type="number" step="0.5" min="0.5" max="24" name="available_hours" class="form-control bg-light border-0 py-2" value="{{ profile.available_hours_per_day }}" required />
                                     <span class="input-group-text bg-light border-0">hours</span>
                                 </div>
-                                <small class="form-text text-muted">How many hours per day can you dedicate to tasks?</small>
                             </div>
 
                             <div class="mb-3">
@@ -111,20 +118,52 @@
                                 <input type="time" name="work_end_time" class="form-control bg-light border-0 py-2" value="{{ profile.work_end_time|time:'H:i' }}" />
                             </div>
 
-                            <button type="submit" class="btn bg-primary-custom fw-bold w-100">
-                                <i class="fa-solid fa-save me-2"></i>Save Settings & Reschedule Tasks
+                            <button type="submit" class="btn bg-primary-custom fw-bold w-100 text-white mt-auto">
+                                <i class="fa-solid fa-save me-2"></i>Save & Reschedule Tasks
                             </button>
                         </form>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="alert alert-info mt-3 py-2 mb-0">
-                            <small>
-                                <i class="fa-solid fa-info-circle me-1"></i>
-                                Changing these settings will automatically reschedule your pending tasks based on your new availability.
-                            </small>
+            <div class="modal fade" id="passwordModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header border-bottom-0 pb-0">
+                            <div>
+                                <h5 class="modal-title fw-bold">Change Password</h5>
+                                <p class="text-muted small m-0">Ensure your account stays secure.</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'settings' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="change_password">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">Current Password</label>
+                                    <input type="password" name="old_password" class="form-control bg-light border-0 py-2" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small">New Password</label>
+                                    <input type="password" name="new_password" class="form-control bg-light border-0 py-2" required />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold small">Confirm New Password</label>
+                                    <input type="password" name="confirm_password" class="form-control bg-light border-0 py-2" required />
+                                </div>
+                                
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-light text-muted fw-bold" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger fw-bold">Update Password</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
         </main>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -135,8 +174,12 @@
                     editBtn.addEventListener('click', function() {
                         document.getElementById('usernameField').removeAttribute('readonly');
                         document.getElementById('emailField').removeAttribute('readonly');
+                        document.getElementById('roleField').removeAttribute('disabled');
+                        
                         document.getElementById('usernameField').classList.remove('bg-light');
                         document.getElementById('emailField').classList.remove('bg-light');
+                        document.getElementById('roleField').classList.remove('bg-light');
+                        
                         document.getElementById('saveProfileBtn').classList.remove('d-none');
                         this.classList.add('d-none');
                         document.getElementById('usernameField').focus();

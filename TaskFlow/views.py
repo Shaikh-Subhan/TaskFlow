@@ -5,8 +5,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.db.models import Sum, Q, Count
 from datetime import datetime, timedelta
-
-from tasks.models import Task
+from tasks.models import Task, UserProfile
 
 # Constants
 ALLOWED_ROLES = {'student', 'teacher', 'corporate', 'entrepreneur'}
@@ -148,6 +147,8 @@ def register(request):
         role = request.POST.get('role')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        if len(password) < 8:
+                messages.error(request, 'password must be at least 8 characters long.')
         confirm_password = request.POST.get('confirm_password')
 
         error = validate_registration(uname, email, password, confirm_password, role)
@@ -188,9 +189,6 @@ def login(request):
 
 @login_required(login_url='login')
 def settings(request):
-    from tasks.models import UserProfile
-    
-    # Get or create user profile
     try:
         profile = request.user.profile
     except:
@@ -199,9 +197,9 @@ def settings(request):
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
         from django.contrib import messages
+        from django.contrib.auth import update_session_auth_hash
         
         if form_type == 'profile_info':
-            # Update core user information
             new_email = request.POST.get('email')
             import re
             if not re.match(r"[^@]+@[^@]+\.[^@]+", new_email):
@@ -210,31 +208,48 @@ def settings(request):
                 
             request.user.username = request.POST.get('username')
             request.user.email = new_email
-            request.user.first_name = request.POST.get('first_name')
+                
             try:
                 request.user.save()
                 messages.success(request, 'Profile updated successfully!')
             except Exception as e:
                 messages.error(request, 'Error updating profile. Username or email might be taken.')
+
+        elif form_type == 'change_password':
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+
+            if not request.user.check_password(old_password):
+                messages.error(request, 'Incorrect current password.')
+            elif new_password != confirm_password:
+                messages.error(request, 'New passwords do not match.')
+            elif len(new_password) < 8:
+                messages.error(request, 'New password must be at least 8 characters long.')
+            else:
+                request.user.set_password(new_password)
+                request.user.save()
+                # Keep the user logged in after password change
+                update_session_auth_hash(request, request.user)
+                messages.success(request, 'Password successfully updated!')
                 
         else:
-            # Update user profile settings (availability)
             available_hours = float(request.POST.get('available_hours', 4.0))
             work_start_time = request.POST.get('work_start_time', '09:00')
             work_end_time = request.POST.get('work_end_time', '17:00')
             
-            # Validate inputs
             if 0 < available_hours <= 24:
                 profile.available_hours_per_day = available_hours
                 profile.work_start_time = work_start_time
                 profile.work_end_time = work_end_time
                 profile.save()
                 
-                # Reschedule all tasks after updating availability
                 Task.schedule_tasks(request.user, force_reschedule=True)
                 messages.success(request, 'Availability settings updated and tasks rescheduled!')
             else:
                 messages.error(request, 'Available hours must be between 0 and 24')
+                
+        return redirect('settings')
     
     context = {
         'profile': profile,
