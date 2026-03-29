@@ -271,18 +271,6 @@ def get_status_tasks(request, status):
     }
 
 @login_required(login_url='login')
-def inprogress(request):
-    """Show in-progress tasks"""
-    context = get_status_tasks(request, 'In Progress')
-    return render(request, 'inprogress.html', context)
-
-@login_required(login_url='login')
-def completed(request):
-    """Show completed tasks"""
-    context = get_status_tasks(request, 'Completed')
-    return render(request, 'completed.html', context)
-
-@login_required(login_url='login')
 def analytics(request):
     """Show analytics for user tasks with detailed charts"""
     from django.db.models.functions import TruncDate

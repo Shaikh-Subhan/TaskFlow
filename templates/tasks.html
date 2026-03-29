@@ -37,16 +37,6 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option>All Categories</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option>All Subjects</option>
-                    </select>
-                </div>
             </form>
 
             <div
@@ -83,6 +73,7 @@
                     id="pending-tab"
                     role="tabpanel">
                     {% for task in tasks %}
+
                     <div class="tasks-list">
                         <div
                             class="task-card p-3 mb-3 {% if task.priority == 'High' %}border-danger{% endif %}">
@@ -130,6 +121,7 @@
                                         <ul
                                             class="dropdown-menu shadow-sm border-0"
                                             style="min-width: 120px">
+    
                                             <li>
                                                 <a
                                                     class="dropdown-item list small fw-bold"

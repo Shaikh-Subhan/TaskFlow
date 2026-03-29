@@ -7,6 +7,8 @@ from .models import Task
 from django.utils.dateparse import parse_datetime, parse_date
 from datetime import datetime, time
 
+from datetime import timedelta
+
 
 # Define valid status constants
 VALID_STATUSES = ('Pending', 'In Progress', 'Completed')
@@ -64,15 +66,10 @@ def edit_task(request, task_id):
         
         task.task = request.POST.get('task')
         task.description = request.POST.get('description', task.description)
-        task.category = request.POST.get('category', task.category)
         task.priority = request.POST.get('priority')
         task.duration = int(request.POST.get('duration') or task.duration)
         
         task.is_hard_deadline = request.POST.get('is_hard_deadline') == 'on'
-        task.is_recurring = request.POST.get('is_recurring') == 'on'
-        task.is_batch_task = request.POST.get('is_batch_task') == 'on'
-        task.is_deep_work = request.POST.get('is_deep_work') == 'on'
-        
         # --- DEADLINE LOGIC ---
         new_deadline_str = request.POST.get('deadline')
         if new_deadline_str:
@@ -94,9 +91,8 @@ def edit_task(request, task_id):
         # ----------------------
         
         task.save(update_fields=[
-            'task', 'description', 'category', 'priority', 'duration', 
-            'deadline', 'is_hard_deadline', 'is_recurring', 'is_batch_task', 
-            'is_deep_work', 'updated_at'
+            'task', 'description', 'priority', 'duration', 
+            'deadline', 'is_hard_deadline', 'updated_at'
         ])
         
         Task.schedule_tasks(request.user)
@@ -169,4 +165,3 @@ def toggle_pause(request, task_id):
         task.save(update_fields=['started_at', 'accumulated_time_seconds', 'is_paused', 'updated_at'])
         
     return redirect(reverse('tasks') + '#progress-tab')
-
