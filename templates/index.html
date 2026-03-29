@@ -9,217 +9,346 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         <link rel="stylesheet" href="{% static 'css/style.css' %}" />
         <style>
+            /* --- Fluid Animated Background --- */
             .hero-section {
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                padding: 100px 0 80px;
+                background: linear-gradient(-45deg, #f8f9fa, #e0f2fe, #f3e8ff, #ffffff);
+                background-size: 400% 400%;
+                animation: gradientBG 15s ease infinite;
+                padding: 140px 0 100px;
+                position: relative;
+                overflow: hidden;
             }
+            @keyframes gradientBG {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            /* --- Floating Shapes --- */
+            .shape {
+                position: absolute;
+                filter: blur(40px);
+                z-index: 0;
+                opacity: 0.6;
+                animation: float 8s ease-in-out infinite;
+            }
+            .shape-1 {
+                background: #0d6efd;
+                width: 300px; height: 300px;
+                border-radius: 50%;
+                top: -100px; right: -100px;
+                animation-delay: 0s;
+            }
+            .shape-2 {
+                background: #6f42c1;
+                width: 250px; height: 250px;
+                border-radius: 50%;
+                bottom: -50px; left: -50px;
+                animation-delay: -4s;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-30px) rotate(10deg); }
+                100% { transform: translateY(0px) rotate(0deg); }
+            }
+            
+            .hero-content {
+                position: relative;
+                z-index: 2;
+            }
+
+            /* --- Glassmorphism Feature Cards --- */
             .feature-card {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                border: 1px solid rgba(0,0,0,0.05);
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            .feature-card.visible {
+                opacity: 1;
+                transform: translateY(0);
             }
             .feature-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+                transform: translateY(-12px) scale(1.02) !important;
+                box-shadow: 0 25px 50px rgba(0,0,0,0.1) !important;
+                background: rgba(255, 255, 255, 0.95);
             }
+            
             .feature-icon {
-                width: 60px;
-                height: 60px;
-                border-radius: 15px;
+                width: 70px;
+                height: 70px;
+                border-radius: 20px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 24px;
-                margin-bottom: 20px;
-            }
-            .navbar-brand img {
-                width: 35px;
-                height: auto;
-                margin-right: 10px;
-            }
-            .role-card {
+                font-size: 28px;
+                margin-bottom: 25px;
                 transition: all 0.3s ease;
-                border: 2px solid transparent;
             }
-            .role-card:hover {
-                border-color: #4361ee;
-                transform: translateY(-5px);
+            .feature-card:hover .feature-icon {
+                transform: scale(1.1) rotate(5deg);
             }
+
+            /* --- Showcase Section --- */
+            .showcase-section {
+                padding: 100px 0;
+                background: #fff;
+                overflow: hidden;
+            }
+            .showcase-content {
+                opacity: 0;
+                transform: translateX(-40px);
+                transition: all 0.8s ease-out;
+            }
+            .showcase-content.visible {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            .showcase-image {
+                opacity: 0;
+                transform: translateX(40px);
+                transition: all 0.8s ease-out;
+                border-radius: 24px;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                padding: 20px;
+            }
+            .showcase-image.visible {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            /* --- Glowing Button --- */
+            .btn-glow {
+                position: relative;
+                z-index: 1;
+                overflow: hidden;
+            }
+            .btn-glow::after {
+                content: '';
+                position: absolute;
+                top: -50%; left: -50%;
+                width: 200%; height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+            .btn-glow:hover::after {
+                opacity: 1;
+                animation: pulse 2s linear infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(0.8); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(0.8); }
+            }
+            
         </style>
     </head>
     <body class="bg-white">
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top py-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white/90 backdrop-blur border-bottom fixed-top py-3" style="background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'home' %}">
-                    <span class="text-primary-custom fs-4">TaskFlow</span>
+                    <span class="text-primary fs-4 fw-bolder" style="background: linear-gradient(45deg, #0d6efd, #6f42c1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TaskFlow</span>
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
-                        <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#roles">Solutions</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#features">Platform Features</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#workflow">The Workflow</a></li>
                     </ul>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'login' %}" class="btn btn-light fw-bold px-4">Log in</a>
-                        <a href="{% url 'register' %}" class="btn bg-primary-custom text-white fw-bold px-4">Sign Up Free</a>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'login' %}" class="btn btn-link text-dark text-decoration-none fw-bold px-3">Log in</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-glow fw-bold px-4 rounded-pill shadow-sm">Start Now</a>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <section class="hero-section text-center mt-5">
-            <div class="container">
+        <section class="hero-section text-center">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="container hero-content">
                 <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <span class="badge bg-primary-custom text-white rounded-pill px-3 py-2 mb-3 fw-medium">Smart Productivity Workspace</span>
-                        <h1 class="display-4 fw-bolder text-dark mb-4 lh-sm">
-                            Master your time.<br><span class="text-primary-custom">Own your day.</span>
+                    <div class="col-lg-9">
+                        <span class="badge bg-white text-primary rounded-pill px-4 py-2 mb-4 fw-bold shadow-sm" style="letter-spacing: 1px;">
+                            <i class="fa-solid fa-bolt text-warning me-2"></i>THE NEXT GENERATION WORKSPACE
+                        </span>
+                        <h1 class="display-3 fw-bolder text-dark mb-4 lh-sm tracking-tight" style="letter-spacing: -1px;">
+                            Master your time.<br>
+                            <span style="background: linear-gradient(45deg, #0d6efd, #6f42c1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Own your day.</span>
                         </h1>
-                        <p class="lead text-muted mb-5 px-md-5">
-                            TaskFlow isn't just a to-do list. It's an intelligent manager that automatically schedules your tasks around your availability, tracks your deep work, and adapts to your exact profession.
+                        <p class="lead text-secondary mb-5 px-md-5 fs-4" style="font-weight: 400;">
+                            TaskFlow isn't just a to-do list. It's a sentient productivity engine that automatically tracks your deep work and optimizes your daily schedule intelligently.
                         </p>
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="{% url 'register' %}" class="btn bg-primary-custom text-white btn-lg fw-bold px-5 rounded-pill shadow-sm">Get Started</a>
-                            <a href="#features" class="btn btn-outline-secondary btn-lg fw-bold px-5 rounded-pill">Learn More</a>
+                        <div class="d-flex justify-content-center gap-4">
+                            <a href="{% url 'register' %}" class="btn btn-primary btn-glow btn-lg fw-bold px-5 py-3 rounded-pill shadow-lg" style="font-size: 1.1rem;">
+                                Start Now — It's Free
+                            </a>
+                            <a href="#features" class="btn btn-outline-dark btn-lg fw-bold px-5 py-3 rounded-pill" style="font-size: 1.1rem;">
+                                Discover How
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="features" class="py-5 mt-4">
+        <section id="features" class="py-5" style="background: #fafafa;">
             <div class="container py-5">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold h1 mb-3">Why choose TaskFlow?</h2>
-                    <p class="text-muted">Everything you need to stay organized, focused, and ahead of your deadlines.</p>
+                <div class="text-center mb-5 scroll-reveal">
+                    <h2 class="fw-bolder display-5 mb-3 text-dark">Supercharge your productivity</h2>
+                    <p class="text-muted fs-5">Everything you need to reach absolute flow state, zero distractions.</p>
                 </div>
                 
-                <div class="row g-4">
+                <div class="row g-5 mt-2">
                     <div class="col-md-4">
-                        <div class="card feature-card h-100 p-4 rounded-4 bg-white shadow-sm">
-                            <div class="feature-icon" style="background-color: #e0f2fe; color: #0284c7;">
-                                <i class="fa-solid fa-calendar-check"></i>
+                        <div class="card feature-card h-100 p-5 scroll-reveal" style="transition-delay: 100ms;">
+                            <div class="feature-icon shadow-sm" style="background-color: #e0f2fe; color: #0284c7;">
+                                <i class="fa-solid fa-brain"></i>
                             </div>
-                            <h3 class="h5 fw-bold mb-3">Intelligent Auto-Scheduling</h3>
-                            <p class="text-muted small mb-0">Tell us how many hours you can work today. TaskFlow automatically fits your high-priority tasks into your schedule before their deadlines hit.</p>
+                            <h3 class="h4 fw-bold mb-3 text-dark">Smart Auto-Scheduling</h3>
+                            <p class="text-muted mb-0 lh-lg">Input your available working hours, and TaskFlow's engine will instantly map out your high-priority items precisely before deadlines strike.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card feature-card h-100 p-4 rounded-4 bg-white shadow-sm">
-                            <div class="feature-icon" style="background-color: #fce7f3; color: #0284c7;">
-                                <i class="fa-solid fa-chart-pie"></i>
+                        <div class="card feature-card h-100 p-5 scroll-reveal" style="transition-delay: 200ms;">
+                            <div class="feature-icon shadow-sm" style="background-color: #f3e8ff; color: #db2777;">
+                                <i class="fa-solid fa-stopwatch-20"></i>
                             </div>
-                            <h3 class="h5 fw-bold mb-3">Advanced Analytics</h3>
-                            <p class="text-muted small mb-0">Track your weekly completion rates, understand your priority distribution, and monitor your deep work sessions with beautiful, real-time charts.</p>
+                            <h3 class="h4 fw-bold mb-3 text-dark">Live Deep Work Tracking</h3>
+                            <p class="text-muted mb-0 lh-lg">Active stopwatches attached to every task. Pause, split, and seamlessly log the exact seconds spent on deep focus to calculate your true velocity.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="card feature-card h-100 p-4 rounded-4 bg-white shadow-sm">
-                            <div class="feature-icon" style="background-color: #f3e8ff; color: #db2777;">
-                                <i class="fa-solid fa-stopwatch"></i>
+                        <div class="card feature-card h-100 p-5 scroll-reveal" style="transition-delay: 300ms;">
+                            <div class="feature-icon shadow-sm" style="background-color: #ecfdf5; color: #059669;">
+                                <i class="fa-solid fa-chart-line"></i>
                             </div>
-                            <h3 class="h5 fw-bold mb-3">Live Time Tracking</h3>
-                            <p class="text-muted small mb-0">Built-in stopwatches for every active task. Pause, resume, and log the exact seconds spent on your work to understand your true velocity.</p>
+                            <h3 class="h4 fw-bold mb-3 text-dark">Real-Time Analytics</h3>
+                            <p class="text-muted mb-0 lh-lg">Watch your progress bars fill dynamically. Visually monitor completion rates, priority distributions, and daily availability in beautiful dashboard tracking.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="roles" class="py-5 bg-light">
-            <div class="container py-5">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold h1 mb-3">Built for how <span class="text-primary-custom">you</span> work</h2>
-                    <p class="text-muted">Select your role to unlock customized tools, categories, and dashboards.</p>
-                </div>
-
-                <div class="row g-4 justify-content-center">
-                    <div class="col-md-6 col-lg-3">
-                        <a href="{% url 'register' %}?role=Student" class="card card-custom role-card h-100 p-4 text-decoration-none d-flex flex-column align-items-center shadow-sm rounded-4">
-                            <div class="icon-box blue mb-3">
-                                <i class="fa-solid fa-graduation-cap"></i>
-                            </div>
-                            <h3 class="h5 text-dark mb-3 fw-bold">Student</h3>
-                            <p class="small text-muted text-center mb-4">
-                                Manage assignments, exams, and study schedules perfectly.
+        <section id="workflow" class="showcase-section">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-6">
+                        <div class="showcase-content">
+                            <span class="text-primary fw-bold mb-2 d-block text-uppercase tracking-wider">Flawless Execution</span>
+                            <h2 class="display-5 fw-bolder mb-4 text-dark">Organize chaos into pure forward momentum.</h2>
+                            <p class="text-secondary fs-5 mb-4 lh-base">
+                                Create tasks with hard deadlines, dynamically pause active work streams, and maintain total control over your schedule. 
                             </p>
-                            <ul class="features-list w-100 flex-grow-1 small text-muted mb-4 px-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Assignment tracking</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Exam preparation</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Study time analytics</li>
+                            <ul class="list-unstyled mb-5 text-dark">
+                                <li class="d-flex align-items-center mb-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 45px; height: 45px; flex-shrink: 0;">
+                                        <i class="fa-solid fa-1"></i>
+                                    </div>
+                                    <div class="fs-5 fw-medium">Capture your tasks &amp; estimate durations</div>
+                                </li>
+                                <li class="d-flex align-items-center mb-4">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 45px; height: 45px; flex-shrink: 0;">
+                                        <i class="fa-solid fa-2"></i>
+                                    </div>
+                                    <div class="fs-5 fw-medium">Set your daily hour capacity</div>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow" style="width: 45px; height: 45px; flex-shrink: 0;">
+                                        <i class="fa-solid fa-3"></i>
+                                    </div>
+                                    <div class="fs-5 fw-medium">Let the engine build your schedule</div>
+                                </li>
                             </ul>
-                            <span class="btn btn-light w-100 btn-sm fw-bold">Select Role</span>
-                        </a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg fw-bold rounded-pill px-5">Join the platform</a>
+                        </div>
                     </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <a href="{% url 'register' %}?role=Teacher" class="card card-custom role-card h-100 p-4 text-decoration-none d-flex flex-column align-items-center shadow-sm rounded-4">
-                            <div class="icon-box green mb-3">
-                                <i class="fa-solid fa-chalkboard-user"></i>
+                    <div class="col-lg-6">
+                        <div class="showcase-image p-4 bg-light text-center d-flex align-items-center justify-content-center" style="min-height: 400px; position: relative;">
+                            <!-- Decorative visual representation of dashboard -->
+                            <div class="w-100 h-100 bg-white rounded-4 shadow-sm p-4 text-start position-relative">
+                                <div class="d-flex justify-content-between mb-4 pb-3 border-bottom">
+                                    <div class="fw-bold fs-5"><i class="fa-solid fa-bolt text-warning me-2"></i>TaskFlow Engine</div>
+                                    <div class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">System Active</div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="fw-bold text-muted small">Daily Capacity Reached</span>
+                                        <span class="fw-bold text-primary small">75%</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px; border-radius: 10px;">
+                                        <div class="progress-bar bg-primary" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="card border-0 bg-light p-3 mb-3 border-start border-4 border-danger">
+                                    <div class="fw-bold">Finalize Project Architecture</div>
+                                    <div class="text-muted small mt-1"><i class="fa-solid fa-clock me-1"></i> Running: 02:45:12</div>
+                                </div>
+                                <div class="card border-0 bg-light p-3 border-start border-4 border-warning">
+                                    <div class="fw-bold">Review PR #142</div>
+                                    <div class="text-muted small mt-1"><i class="fa-solid fa-pause me-1"></i> Paused</div>
+                                </div>
                             </div>
-                            <h3 class="h5 text-dark mb-3 fw-bold">Teacher</h3>
-                            <p class="small text-muted text-center mb-4">
-                                Organize lesson plans, grading queues, and tasks.
-                            </p>
-                            <ul class="features-list w-100 flex-grow-1 small text-muted mb-4 px-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Recurring classes</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Batch grading tools</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Lesson planning view</li>
-                            </ul>
-                            <span class="btn btn-light w-100 btn-sm fw-bold">Select Role</span>
-                        </a>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <a href="{% url 'register' %}?role=Employee" class="card card-custom role-card h-100 p-4 text-decoration-none d-flex flex-column align-items-center shadow-sm rounded-4">
-                            <div class="icon-box purple mb-3">
-                                <i class="fa-solid fa-briefcase"></i>
-                            </div>
-                            <h3 class="h5 text-dark mb-3 fw-bold">Corporate</h3>
-                            <p class="small text-muted text-center mb-4">
-                                Balance meetings, projects, and daily deliverables.
-                            </p>
-                            <ul class="features-list w-100 flex-grow-1 small text-muted mb-4 px-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Meeting management</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Project milestones</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Daily reports</li>
-                            </ul>
-                            <span class="btn btn-light w-100 btn-sm fw-bold">Select Role</span>
-                        </a>
-                    </div>
-
-                    <div class="col-md-6 col-lg-3">
-                        <a href="{% url 'register' %}?role=Entrepreneur" class="card card-custom role-card h-100 p-4 text-decoration-none d-flex flex-column align-items-center shadow-sm rounded-4">
-                            <div class="icon-box orange mb-3">
-                                <i class="fa-solid fa-rocket"></i>
-                            </div>
-                            <h3 class="h5 text-dark mb-3 fw-bold">Entrepreneur</h3>
-                            <p class="small text-muted text-center mb-4">
-                                Prioritize high-value tasks and long-term strategy.
-                            </p>
-                            <ul class="features-list w-100 flex-grow-1 small text-muted mb-4 px-3">
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Deep work blocking</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>High-ROI focus</li>
-                                <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Strategic planning</li>
-                            </ul>
-                            <span class="btn btn-light w-100 btn-sm fw-bold">Select Role</span>
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <footer class="bg-white border-top py-4 mt-auto">
-            <div class="container text-center">
-                <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
-                    <h4 class="fw-bold h5 m-0 text-primary-custom">TaskFlow</h4>
+        <section class="py-5" style="background: linear-gradient(135deg, #0d6efd, #6f42c1); color: white;">
+            <div class="container py-5 text-center">
+                <h2 class="display-4 fw-bolder mb-4 text-white">Ready to reclaim your time?</h2>
+                <p class="fs-4 text-white-50 mb-5">Join users optimizing their workflows every single day.</p>
+                <a href="{% url 'register' %}" class="btn btn-light btn-lg fw-bolder text-primary px-5 py-3 rounded-pill shadow">
+                    Start Your Free Workspace Today
+                </a>
+            </div>
+        </section>
+
+        <footer class="bg-dark text-white py-5 mt-auto">
+            <div class="container text-center pt-3">
+                <div class="d-flex justify-content-center align-items-center gap-2 mb-4">
+                    <h4 class="fw-bolder fs-3 m-0" style="background: linear-gradient(45deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TaskFlow</h4>
                 </div>
-                <p class="text-muted small mb-0">&copy; {% now "Y" %} TaskFlow. All rights reserved.</p>
+                <p class="text-white-50 small mb-0">&copy; {% now "Y" %} TaskFlow. All rights reserved. Designed for focus.</p>
             </div>
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Simple Scroll Reveal Script
+            document.addEventListener('DOMContentLoaded', () => {
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.1
+                };
+
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe feature cards and showcase elements
+                document.querySelectorAll('.feature-card, .scroll-reveal, .showcase-content, .showcase-image').forEach((el) => {
+                    observer.observe(el);
+                });
+            });
+        </script>
     </body>
 </html>

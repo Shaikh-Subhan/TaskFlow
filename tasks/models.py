@@ -69,17 +69,11 @@ class Task(models.Model):
     def schedule_tasks(cls, user, force_reschedule=False):
         """
         Intelligently schedule tasks based on available time and deadlines.
-        Algorithm:
-        1. Get all pending tasks for the user sorted by deadline (urgent first) and priority
-        2. Get user's daily available time
-        3. For each day starting from today, allocate tasks based on available time
-        4. If a task won't fit in current day, reschedule to next day
-        5. Respect deadline constraints - don't schedule after deadline
+        Handles edge cases like overdue tasks, hard deadlines, and day rollovers.
         """
         from django.db.models import Case, When, Value, IntegerField
         today = datetime.now().date()
         
-        # Get or create user profile
         try:
             profile = user.profile
         except:
@@ -87,11 +81,20 @@ class Task(models.Model):
         
         available_minutes_per_day = int(profile.available_hours_per_day * 60)
         
+        # CRITICAL EDGE CASE 1: Auto-Rollover
+        # Any incomplete task (Pending/In Progress) from the PAST MUST have its schedule cleared 
+        # so the engine catches it and forces it onto today. Otherwise, they disappear into yesterday.
+        cls.objects.filter(
+            user=user,
+            status__in=['Pending', 'In Progress'],
+            scheduled_date__lt=today
+        ).update(scheduled_date=None)
+        
         if force_reschedule:
-            # Clear scheduled_date for all Pending tasks so they are recalculated
-            cls.objects.filter(user=user, status='Pending').update(scheduled_date=None)
+            # Wipe all future scheduling to rebuild from scratch
+            cls.objects.filter(user=user, status__in=['Pending', 'In Progress']).update(scheduled_date=None)
 
-        # 1. Pre-fill daily_schedule with time from tasks that are ALREADY scheduled for today or future
+        # Build daily schedule map of ALREADY scheduled tasks from TODAY onwards
         already_scheduled = cls.objects.filter(
             user=user,
             status__in=['Pending', 'In Progress'],
@@ -101,15 +104,12 @@ class Task(models.Model):
         
         daily_schedule = {}
         for t in already_scheduled:
-            if t.scheduled_date not in daily_schedule:
-                daily_schedule[t.scheduled_date] = 0
-            daily_schedule[t.scheduled_date] += t.duration
+            daily_schedule[t.scheduled_date] = daily_schedule.get(t.scheduled_date, 0) + t.duration
         
-        # 2. Get all pending tasks that STILL need scheduling
-        # Use Case/When to properly sort Priority: High -> Medium -> Low
+        # Grab all the tasks that need computing (including the ones rolled over)
         pending_tasks = cls.objects.filter(
             user=user, 
-            status='Pending',
+            status__in=['Pending', 'In Progress'],
             scheduled_date__isnull=True
         ).annotate(
             priority_weight=Case(
@@ -124,47 +124,45 @@ class Task(models.Model):
             task_duration = task.duration  # in minutes
             deadline = task.deadline or (today + timedelta(days=365))  # 1 year default
             
-            # Start searching from today
             current_date = today
-            # Try to find a day with available time
             while True:
-                # If we breached the deadline and it's a hard deadline, FORCE it onto the deadline
-                if current_date > deadline and task.is_hard_deadline:
-                    task.scheduled_date = deadline
-                    scheduled = True
+                # CRITICAL EDGE CASE 2: Overdue Hard Deadlines
+                # If today is past the deadline, and it's a hard deadline, it failed.
+                # The engine MUST force it to TODAY so the user sees it prominently.
+                if current_date >= deadline and task.is_hard_deadline:
+                    task.scheduled_date = current_date
                     break
                     
-                # Initialize daily time if not exists
-                if current_date not in daily_schedule:
-                    daily_schedule[current_date] = 0
+                used_time = daily_schedule.get(current_date, 0)
                 
-                # Check if task fits in current day
-                used_time = daily_schedule[current_date]
+                # Check if task perfectly fits in current_date
                 if used_time + task_duration <= available_minutes_per_day:
-                    # Schedule task for this day
                     task.scheduled_date = current_date
-                    scheduled = True
                     break
                 else:
-                    # If it doesn't fit, but today IS the deadline and it's a hard deadline, FORCE it
+                    # It doesn't fit. But if current_date exactly matches the deadline, 
+                    # and it's a hard deadline, we FORCE it (causing an Overbook alert).
                     if current_date == deadline and task.is_hard_deadline:
-                        task.scheduled_date = deadline
-                        scheduled = True
+                        task.scheduled_date = current_date
                         break
                     
-                    # Otherwise, move to next day (flexible tasks push past deadline if needed)
+                    # Otherwise, this flexible task gets bumped to the next day.
                     current_date += timedelta(days=1)
             
+            # Save the calculated date back to the database
             task.save(update_fields=['scheduled_date'])
-            if task.scheduled_date not in daily_schedule:
-                daily_schedule[task.scheduled_date] = 0
-            daily_schedule[task.scheduled_date] += task_duration
+            daily_schedule[task.scheduled_date] = daily_schedule.get(task.scheduled_date, 0) + task_duration
         
         return True
     
     @classmethod
     def get_today_schedule(cls, user):
         """Get today's scheduled tasks with time breakdown"""
+        # CRITICAL EDGE CASE 3: Dynamic Rollover Execution
+        # By dynamically calling the scheduler here, we guarantee that whenever the user
+        # natively opens the app/dashboard tomorrow, all yesterday's tasks instantly roll over.
+        cls.schedule_tasks(user)
+
         today = datetime.now().date()
         
         try:
@@ -174,20 +172,21 @@ class Task(models.Model):
         
         available_minutes = int(profile.available_hours_per_day * 60)
         
-        # Get tasks scheduled for today
+        # Get tasks perfectly scheduled for today
         today_tasks = cls.objects.filter(
             user=user,
             scheduled_date=today,
             status__in=['Pending', 'In Progress']
         ).order_by('-priority')
         
+        # Determine duration consumed by locally completed tasks TODAY
         completed_today_tasks = cls.objects.filter(
             user=user,
             scheduled_date=today,
             status='Completed'
         )
         
-        # Calculate time metrics
+        # Calculate time metrics strictly
         pending_duration = sum(task.duration for task in today_tasks)
         completed_duration = sum(task.duration for task in completed_today_tasks)
         

@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 from tasks.models import Task, UserProfile
 
 # Constants
-ALLOWED_ROLES = {'student', 'teacher', 'corporate', 'entrepreneur'}
 TASK_STATUSES = ('Pending', 'In Progress', 'Completed')
 
 def home(request):
@@ -122,13 +121,10 @@ def dashboard(request):
     }
     return render(request, 'dashboard.html', context)
 
-def validate_registration(uname, email, password, confirm_password, role):
+def validate_registration(uname, email, password, confirm_password):
     """Validate registration data"""
     if not uname or not email or not password:
         return 'Please fill out all required fields'
-    
-    if not role or role not in ALLOWED_ROLES:
-        return 'Please select a valid role'
     
     if password != confirm_password:
         return 'Passwords do not match'
@@ -144,21 +140,19 @@ def validate_registration(uname, email, password, confirm_password, role):
 def register(request):
     if request.method == 'POST':
         uname = request.POST.get('username')
-        role = request.POST.get('role')
         email = request.POST.get('email')
         password = request.POST.get('password')
         if len(password) < 8:
                 messages.error(request, 'password must be at least 8 characters long.')
         confirm_password = request.POST.get('confirm_password')
 
-        error = validate_registration(uname, email, password, confirm_password, role)
+        error = validate_registration(uname, email, password, confirm_password)
         if error:
             messages.error(request, error)
             return render(request, 'signup.html')
 
         # Create user
         user = User.objects.create_user(username=uname, email=email, password=password)
-        user.first_name = role
         user.save()
 
         # Authenticate and login
